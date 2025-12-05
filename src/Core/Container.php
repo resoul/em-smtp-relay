@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Core;
 
+use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\Security\Encryption;
 use Emercury\Smtp\Security\Validator;
 use Emercury\Smtp\Security\NonceManager;
@@ -48,19 +49,22 @@ class Container
             $this->get(Validator::class),
             $this->get(NonceManager::class),
             $this->get(Config::class),
-            $this->get(RateLimiter::class)
+            $this->get(RateLimiter::class),
+            $this->get(AdminNotifier::class)
         ));
 
         $this->singleton(AdvancedTab::class, fn() => new AdvancedTab(
             $this->get(Validator::class),
             $this->get(NonceManager::class),
-            $this->get(Config::class)
+            $this->get(Config::class),
+            $this->get(AdminNotifier::class)
         ));
 
         $this->singleton(TestEmailTab::class, fn() => new TestEmailTab(
             $this->get(NonceManager::class),
             $this->get(Config::class),
-            $this->get(RateLimiter::class)
+            $this->get(RateLimiter::class),
+            $this->get(AdminNotifier::class)
         ));
 
         $this->singleton(SettingsPage::class, fn() => new SettingsPage(

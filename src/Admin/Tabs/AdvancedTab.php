@@ -4,24 +4,29 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
+use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
 use Emercury\Smtp\Security\Validator;
 use Emercury\Smtp\Security\NonceManager;
 use Emercury\Smtp\Config\Config;
+use Emercury\Smtp\Admin\AdminNotifier;
 
 class AdvancedTab
 {
     private Validator $validator;
     private NonceManager $nonceManager;
     private Config $config;
+    private AdminNotifier $notifier;
 
     public function __construct(
         Validator $validator,
         NonceManager $nonceManager,
-        Config $config
+        Config $config,
+        AdminNotifier $notifier
     ) {
         $this->validator = $validator;
         $this->nonceManager = $nonceManager;
         $this->config = $config;
+        $this->notifier = $notifier;
     }
 
     public function render(): void
@@ -45,56 +50,28 @@ class AdvancedTab
             );
         }
 
-        $rawData = [
-            'reply_to_email' => $_POST['reply_to_email'] ?? '',
-            'reply_to_name' => $_POST['reply_to_name'] ?? '',
-            'force_reply_to' => $_POST['force_reply_to'] ?? '',
-            'cc_email' => $_POST['cc_email'] ?? '',
-            'cc_name' => $_POST['cc_name'] ?? '',
-            'force_cc' => $_POST['force_cc'] ?? '',
-            'bcc_email' => $_POST['bcc_email'] ?? '',
-            'bcc_name' => $_POST['bcc_name'] ?? '',
-            'force_bcc' => $_POST['force_bcc'] ?? '',
-        ];
+        $dto = new AdvancedSettingsDTO(
+            $_POST['reply_to_email'],
+            $_POST['reply_to_name'],
+            $_POST['force_reply_to'],
+            $_POST['cc_email'],
+            $_POST['cc_name'],
+            $_POST['force_cc'],
+            $_POST['bcc_email'],
+            $_POST['bcc_name'],
+            $_POST['force_bcc']
+        );
 
-        $data = $this->validator->sanitizeAdvancedSettings($rawData);
-        $errors = $this->validator->validateAdvancedSettings($rawData);
+        $errors = $this->validator->validateAdvancedSettings($dto);
 
         if (!empty($errors)) {
-            $this->displayErrors($errors);
+            $this->notifier->addErrors($errors);
             return;
         }
 
-        $saveData = [
-            'em_smtp_reply_to_email' => $data['reply_to_email'],
-            'em_smtp_reply_to_name' => $data['reply_to_name'],
-            'em_smtp_force_reply_to' => $data['force_reply_to'],
-            'em_smtp_cc_email' => $data['cc_email'],
-            'em_smtp_cc_name' => $data['cc_name'],
-            'em_smtp_force_cc' => $data['force_cc'],
-            'em_smtp_bcc_email' => $data['bcc_email'],
-            'em_smtp_bcc_name' => $data['bcc_name'],
-            'em_smtp_force_bcc' => $data['force_bcc'],
-        ];
+        $this->validator->sanitizeAdvancedSettings($dto);
+        $this->config->saveAdvancedSettings($dto);
 
-        $this->config->saveAdvancedSettings($saveData);
-
-        $this->displaySuccess(__('Settings Saved!', 'em-smtp-relay'));
-    }
-
-    private function displaySuccess(string $message): void
-    {
-        echo ''
-            . esc_html($message)
-            . '';
-    }
-
-    private function displayErrors(array $errors): void
-    {
-        echo '';
-        foreach ($errors as $error) {
-            echo '' . esc_html($error) . '';
-        }
-        echo '';
+        $this->notifier->addSuccess(__('Settings Saved!', 'em-smtp-relay'));
     }
 }

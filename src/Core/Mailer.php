@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Core;
 
+use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
+use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
 use Emercury\Smtp\Security\Encryption;
 use Emercury\Smtp\Security\Validator;
 use Emercury\Smtp\Config\Config;
@@ -52,11 +54,11 @@ class Mailer
         }
     }
 
-    private function validateSettings(array $settings): bool
+    private function validateSettings(SmtpSettingsDTO $settings): bool
     {
-        if (empty($settings['em_smtp_username']) ||
-            empty($settings['em_smtp_password']) ||
-            empty($settings['em_smtp_from_email'])) {
+        if (empty($settings->smtpUsername) ||
+            empty($settings->smtpPassword) ||
+            empty($settings->fromEmail)) {
 
             do_action('wp_mail_failed', new WP_Error(
                 'wp_mail_failed',
@@ -69,28 +71,28 @@ class Mailer
         return true;
     }
 
-    private function configurePhpMailer(PHPMailer $phpmailer, array $settings): void
+    private function configurePhpMailer(PHPMailer $phpmailer, SmtpSettingsDTO $settings): void
     {
         $phpmailer->isSMTP();
         $phpmailer->SMTPAuth = true;
         $phpmailer->Host = Config::SMTP_HOST;
-        $phpmailer->Username = $settings['em_smtp_username'];
-        $password = $this->encryption->decrypt($settings['em_smtp_password']);
+        $phpmailer->Username = $settings->smtpUsername;
+        $password = $this->encryption->decrypt($settings->smtpPassword);
 
         if (empty($password)) {
             throw new \RuntimeException('Failed to decrypt SMTP password');
         }
 
-        $phpmailer->Password = $this->encryption->decrypt($settings['em_smtp_password']);
-        $phpmailer->SMTPSecure = $settings['em_smtp_encryption'];
-        $phpmailer->Port = $this->config->getSmtpPort($settings['em_smtp_encryption']);
+        $phpmailer->Password = $password;
+        $phpmailer->SMTPSecure = $settings->smtpEncryption;
+        $phpmailer->Port = $this->config->getSmtpPort($settings->smtpEncryption);
     }
 
     private function prepareEmail(
         PHPMailer $phpmailer,
         array $atts,
-        array $settings,
-        array $advancedSettings
+        SmtpSettingsDTO $settings,
+        AdvancedSettingsDTO $advancedSettings
     ): void {
         [$to, $subject, $message, $headers, $attachments] = $this->parseMailAttributes($atts);
 
@@ -109,10 +111,10 @@ class Mailer
         }
 
         // Set From
-        $fromEmail = $settings['em_smtp_from_email'];
-        $fromName = $settings['em_smtp_from_name'];
+        $fromEmail = $settings->fromEmail;
+        $fromName = $settings->fromName;
 
-        if (empty($settings['em_smtp_force_from_address']) && isset($parsedHeaders['from'])) {
+        if (empty($settings->forceFromAddress) && isset($parsedHeaders['from'])) {
             [$fromName, $fromEmail] = $this->parseEmailHeader([$parsedHeaders['from']]);
         }
 
@@ -181,12 +183,12 @@ class Mailer
     private function handleReplyTo(
         PHPMailer $phpmailer,
         array $headers,
-        array $advancedSettings
+        AdvancedSettingsDTO $advancedSettings
     ): void {
-        $replyTo = $advancedSettings['em_smtp_reply_to_email'] ?? '';
-        $replyToName = $advancedSettings['em_smtp_reply_to_name'] ?? '';
+        $replyTo = $advancedSettings->replyToEmail;
+        $replyToName = $advancedSettings->replyToName;
 
-        if (empty($advancedSettings['em_smtp_force_reply_to']) && isset($headers['reply-to'])) {
+        if (empty($advancedSettings->forceReplyTo) && isset($headers['reply-to'])) {
             [$replyToName, $replyTo] = $this->parseEmailHeader([explode(',', $headers['reply-to'])]);
         }
 
@@ -198,14 +200,14 @@ class Mailer
     private function handleCc(
         PHPMailer $phpmailer,
         array $headers,
-        array $advancedSettings
+        AdvancedSettingsDTO $advancedSettings
     ): void {
         $ccList = [];
 
-        if (!empty($advancedSettings['em_smtp_force_cc'])) {
+        if (!empty($advancedSettings->forceCc)) {
             $ccList = [$this->createEmailHeader(
-                $advancedSettings['em_smtp_cc_email'] ?? '',
-                $advancedSettings['em_smtp_cc_name'] ?? ''
+                $advancedSettings->ccEmail,
+                $advancedSettings->ccName
             )];
         } elseif (isset($headers['cc'])) {
             $ccList = explode(',', $headers['cc']);
@@ -222,14 +224,14 @@ class Mailer
     private function handleBcc(
         PHPMailer $phpmailer,
         array $headers,
-        array $advancedSettings
+        AdvancedSettingsDTO $advancedSettings
     ): void {
         $bccList = [];
 
-        if (!empty($advancedSettings['em_smtp_force_bcc'])) {
+        if (!empty($advancedSettings->forceBcc)) {
             $bccList = [$this->createEmailHeader(
-                $advancedSettings['em_smtp_bcc_email'] ?? '',
-                $advancedSettings['em_smtp_bcc_name'] ?? ''
+                $advancedSettings->bccEmail,
+                $advancedSettings->bccName
             )];
         } elseif (isset($headers['bcc'])) {
             $bccList = explode(',', $headers['bcc']);

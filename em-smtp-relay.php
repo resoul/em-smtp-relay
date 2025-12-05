@@ -28,10 +28,23 @@ define('EM_SMTP_PATH', plugin_dir_path(__FILE__));
 define('EM_SMTP_URL', plugin_dir_url(__FILE__));
 define('EM_SMTP_BASENAME', plugin_basename(__FILE__));
 
-// PSR-4 Autoloader
-require_once __DIR__ . '/autoload.php';
+spl_autoload_register(function (string $class): void {
+    $prefix = 'Emercury\\Smtp\\';
+    $baseDir = __DIR__ . '/src/';
+    $len = strlen($prefix);
 
-// Bootstrap the plugin
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $relativeClass = substr($class, $len);
+    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+
 add_action('plugins_loaded', function () {
     $container = new Emercury\Smtp\Core\Container();
     $plugin = new Emercury\Smtp\Core\Plugin($container);

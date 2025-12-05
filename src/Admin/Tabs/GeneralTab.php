@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
+use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
 use Emercury\Smtp\Security\Encryption;
 use Emercury\Smtp\Security\Validator;
 use Emercury\Smtp\Security\NonceManager;
 use Emercury\Smtp\Config\Config;
 use Emercury\Smtp\Security\RateLimiter;
+use Emercury\Smtp\Admin\AdminNotifier;
 
 class GeneralTab
 {
@@ -17,19 +19,22 @@ class GeneralTab
     private NonceManager $nonceManager;
     private Config $config;
     private RateLimiter $rateLimiter;
+    private AdminNotifier $notifier;
 
     public function __construct(
         Encryption $encryption,
         Validator $validator,
         NonceManager $nonceManager,
         Config $config,
-        RateLimiter $rateLimiter
+        RateLimiter $rateLimiter,
+        AdminNotifier $notifier
     ) {
         $this->encryption = $encryption;
         $this->validator = $validator;
         $this->nonceManager = $nonceManager;
         $this->config = $config;
         $this->rateLimiter = $rateLimiter;
+        $this->notifier = $notifier;
     }
 
     public function render(): void
@@ -55,51 +60,38 @@ class GeneralTab
 
         $userId = get_current_user_id();
         if (!$this->rateLimiter->checkLimit('settings_update_' . $userId)) {
-            $this->displayErrors([
+            $this->notifier->addError(
                 __('Too many update attempts. Please wait before trying again.', 'em-smtp-relay')
-            ]);
+            );
             return;
         }
 
-        $rawData = [
-            'smtp_username' => $_POST['smtp_username'] ?? '',
-            'smtp_password' => $_POST['smtp_password'] ?? '',
-            'smtp_encryption' => $_POST['encryption'] ?? 'tls',
-            'from_email' => $_POST['from_email'] ?? '',
-            'from_name' => $_POST['from_name'] ?? '',
-            'force_from_address' => $_POST['force_from_address'] ?? '',
-        ];
-
-        $sanitized = $this->validator->sanitizeSettings($rawData);
-        $errors = $this->validator->validateSmtpSettings($sanitized);
+        $dto = new SmtpSettingsDTO(
+            $_POST['smtp_username'],
+            $_POST['smtp_password'],
+            $_POST['encryption'],
+            $_POST['from_email'],
+            $_POST['from_name'],
+            $_POST['force_from_address'],
+        );
+        $this->validator->sanitizeSettings($dto);
+        $errors = $this->validator->validateSmtpSettings($dto);
 
         if (!empty($errors)) {
-            $this->displayErrors($errors);
+            $this->notifier->addErrors($errors);
             return;
         }
 
-        $this->saveSettings($sanitized);
+        $this->saveSettings($dto);
     }
 
-    private function saveSettings(array $sanitizedData): void
+    private function saveSettings(SmtpSettingsDTO $dto): void
     {
-        $smtpPassword = $this->processPassword($sanitizedData['smtp_password']);
+        $dto->smtpPassword = $this->processPassword($dto->smtpPassword);
+        $dto->smtpPort = $this->config->getSmtpPort($dto->smtpEncryption);
+        $this->config->saveGeneralSettings($dto);
 
-        $data = [
-            'em_smtp_host' => Config::SMTP_HOST,
-            'em_smtp_auth' => 'true',
-            'em_smtp_username' => $sanitizedData['smtp_username'],
-            'em_smtp_password' => $smtpPassword,
-            'em_smtp_encryption' => $sanitizedData['smtp_encryption'],
-            'em_smtp_from_email' => $sanitizedData['from_email'],
-            'em_smtp_from_name' => $sanitizedData['from_name'],
-            'em_smtp_force_from_address' => $sanitizedData['force_from_address'],
-            'em_smtp_port' => $this->config->getSmtpPort($sanitizedData['smtp_encryption']),
-        ];
-
-        $this->config->saveGeneralSettings($data);
-
-        $this->displaySuccess(__('Settings Saved!', 'em-smtp-relay'));
+        $this->notifier->addSuccess(__('Settings Saved!', 'em-smtp-relay'));
     }
 
     private function processPassword(string $password): string
@@ -117,22 +109,6 @@ class GeneralTab
         }
 
         $currentData = $this->config->getGeneralSettings();
-        return $currentData['em_smtp_password'] ?? '';
-    }
-
-    private function displayErrors(array $errors): void
-    {
-        echo '';
-        foreach ($errors as $error) {
-            echo '' . esc_html($error) . '';
-        }
-        echo '';
-    }
-
-    private function displaySuccess(string $message): void
-    {
-        echo ''
-            . esc_html($message)
-            . '';
+        return $currentData->smtpPassword;
     }
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Config;
 
+use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
+use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
+
 class Config
 {
     public const SMTP_HOST = 'smtp.emercury.net';
@@ -16,7 +19,7 @@ class Config
         return $encryption === 'ssl' ? 465 : 587;
     }
 
-    public function getGeneralSettings(): array
+    public function getGeneralSettings(): SmtpSettingsDTO
     {
         $data = get_option(self::OPTION_GENERAL);
 
@@ -24,10 +27,10 @@ class Config
             return $this->getDefaultGeneralSettings();
         }
 
-        return $data;
+        return SmtpSettingsDTO::fromArray($data);
     }
 
-    public function getAdvancedSettings(): array
+    public function getAdvancedSettings(): AdvancedSettingsDTO
     {
         $data = get_option(self::OPTION_ADVANCED);
 
@@ -35,43 +38,26 @@ class Config
             return $this->getDefaultAdvancedSettings();
         }
 
-        return $data;
+        return AdvancedSettingsDTO::fromArray($data);
     }
 
-    public function saveGeneralSettings(array $data): bool
+    public function saveGeneralSettings(SmtpSettingsDTO $data): bool
     {
-        return update_option(self::OPTION_GENERAL, $data);
+        return update_option(self::OPTION_GENERAL, $data->toArray());
     }
 
-    public function saveAdvancedSettings(array $data): bool
+    public function saveAdvancedSettings(AdvancedSettingsDTO $data): bool
     {
-        return update_option(self::OPTION_ADVANCED, $data);
+        return update_option(self::OPTION_ADVANCED, $data->toArray());
     }
 
-    private function getDefaultGeneralSettings(): array
+    private function getDefaultGeneralSettings(): SmtpSettingsDTO
     {
-        return [
-            'em_smtp_username' => '',
-            'em_smtp_password' => '',
-            'em_smtp_encryption' => 'tls',
-            'em_smtp_from_email' => '',
-            'em_smtp_from_name' => '',
-            'em_smtp_force_from_address' => 0,
-        ];
+        return new SmtpSettingsDTO();
     }
 
-    private function getDefaultAdvancedSettings(): array
+    private function getDefaultAdvancedSettings(): AdvancedSettingsDTO
     {
-        return [
-            'em_smtp_reply_to_email' => '',
-            'em_smtp_reply_to_name' => '',
-            'em_smtp_force_reply_to' => 0,
-            'em_smtp_cc_email' => '',
-            'em_smtp_cc_name' => '',
-            'em_smtp_force_cc' => 0,
-            'em_smtp_bcc_email' => '',
-            'em_smtp_bcc_name' => '',
-            'em_smtp_force_bcc' => 0,
-        ];
+        return new AdvancedSettingsDTO();
     }
 }

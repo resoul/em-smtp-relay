@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Security;
 
+use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
+use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
+
 class Validator
 {
     public function validateEmail(string $email): bool
@@ -11,72 +14,67 @@ class Validator
         return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 
-    public function validateSmtpSettings(array $data): array
+    public function validateSmtpSettings(SmtpSettingsDTO $data): array
     {
         $errors = [];
 
-        if (empty($data['smtp_username'])) {
+        if (empty($data->smtpUsername)) {
             $errors[] = __('SMTP Username is required', 'em-smtp-relay');
         }
 
-        if (empty($data['smtp_password'])) {
+        if (empty($data->smtpPassword)) {
             $errors[] = __('SMTP Password is required', 'em-smtp-relay');
         }
 
-        if (!empty($data['from_email']) && !$this->validateEmail($data['from_email'])) {
+        if (!empty($data->fromEmail) && !$this->validateEmail($data->fromEmail)) {
             $errors[] = __('Invalid From Email Address', 'em-smtp-relay');
         }
 
-        if (!in_array($data['smtp_encryption'] ?? '', ['tls', 'ssl'], true)) {
+        if (!in_array($data->smtpEncryption ?? '', ['tls', 'ssl'], true)) {
             $errors[] = __('Invalid encryption type', 'em-smtp-relay');
         }
 
         return $errors;
     }
 
-    public function sanitizeSettings(array $data): array
+    public function sanitizeSettings(SmtpSettingsDTO $data): void
     {
-        return [
-            'smtp_username' => sanitize_text_field($data['smtp_username'] ?? ''),
-            'smtp_password' => $data['smtp_password'] ?? '',
-            'smtp_encryption' => sanitize_text_field($data['smtp_encryption'] ?? 'tls'),
-            'from_email' => sanitize_email($data['from_email'] ?? ''),
-            'from_name' => sanitize_text_field($data['from_name'] ?? ''),
-            'force_from_address' => !empty($data['force_from_address']) ? 1 : 0,
-        ];
+        $data->smtpUsername = sanitize_text_field($data->smtpUsername);
+        $data->smtpEncryption = sanitize_text_field($data->smtpEncryption);
+        $data->forceFromAddress = !empty($data->forceFromAddress);
+        $data->fromEmail = sanitize_email($data->fromEmail);
+        $data->fromName = sanitize_text_field($data->fromName);
     }
 
-    public function validateAdvancedSettings(array $data): array
+    public function validateAdvancedSettings(AdvancedSettingsDTO $data): array
     {
         $errors = [];
 
-        if (!empty($data['reply_to_email']) && !$this->validateEmail($data['reply_to_email'])) {
+        if (!empty($data->replyToEmail) && !$this->validateEmail($data->replyToEmail)) {
             $errors[] = __('Invalid Reply-To Email Address', 'em-smtp-relay');
         }
 
-        if (!empty($data['cc_email']) && !$this->validateEmail($data['cc_email'])) {
+        if (!empty($data->ccEmail) && !$this->validateEmail($data->ccEmail)) {
             $errors[] = __('Invalid CC Email Address', 'em-smtp-relay');
         }
 
-        if (!empty($data['bcc_email']) && !$this->validateEmail($data['bcc_email'])) {
+        if (!empty($data->bccEmail) && !$this->validateEmail($data->bccEmail)) {
             $errors[] = __('Invalid BCC Email Address', 'em-smtp-relay');
         }
 
         return $errors;
     }
 
-    public function sanitizeAdvancedSettings(array $data): array
+    public function sanitizeAdvancedSettings(AdvancedSettingsDTO $data): void
     {
-        return [
-            'reply_to_email' => sanitize_email($data['reply_to_email'] ?? ''),
-            'reply_to_name' => sanitize_text_field($data['reply_to_name'] ?? ''),
-            'force_reply_to' => !empty($data['force_reply_to']) ? 1 : 0,
-            'cc_email' => sanitize_email($data['cc_email'] ?? ''),
-            'cc_name' => sanitize_text_field($data['cc_name'] ?? ''),
-            'force_cc' => !empty($data['force_cc']) ? 1 : 0,
-            'bcc_email' => sanitize_email($data['bcc_email'] ?? ''),
-            'bcc_name' => sanitize_text_field($data['bcc_name'] ?? ''),
-            'force_bcc' => !empty($data['force_bcc']) ? 1 : 0,
-        ];
+        $data->forceReplyTo = !empty($data->forceReplyTo);
+        $data->forceCc = !empty($data->forceReplyTo);
+        $data->forceBcc = !empty($data->forceReplyTo);
+        $data->replyToEmail = sanitize_email($data->replyToEmail);
+        $data->ccEmail = sanitize_email($data->ccEmail);
+        $data->bccEmail = sanitize_email($data->bccEmail);
+        $data->replyToName = sanitize_text_field($data->replyToName);
+        $data->bccName = sanitize_text_field($data->bccName);
+        $data->ccName = sanitize_text_field($data->ccName);
     }
 }

@@ -7,21 +7,25 @@ namespace Emercury\Smtp\Admin\Tabs;
 use Emercury\Smtp\Security\NonceManager;
 use Emercury\Smtp\Config\Config;
 use Emercury\Smtp\Security\RateLimiter;
+use Emercury\Smtp\Admin\AdminNotifier;
 
 class TestEmailTab
 {
     private NonceManager $nonceManager;
     private Config $config;
     private RateLimiter $rateLimiter;
+    private AdminNotifier $notifier;
 
     public function __construct(
         NonceManager $nonceManager,
         Config $config,
-        RateLimiter $rateLimiter
+        RateLimiter $rateLimiter,
+        AdminNotifier $notifier
     ) {
         $this->nonceManager = $nonceManager;
         $this->config = $config;
         $this->rateLimiter = $rateLimiter;
+        $this->notifier = $notifier;
     }
 
     public function render(): void
@@ -45,23 +49,27 @@ class TestEmailTab
 
         $userId = get_current_user_id();
         if (!$this->rateLimiter->checkLimit('test_email_' . $userId)) {
-            $this->displayError(
+            $this->notifier->addError(
                 __('Too many test emails sent. Please wait before trying again.', 'em-smtp-relay')
             );
             return;
         }
 
         $to = sanitize_email($_POST['em_smtp_relay_to_email'] ?? '');
-        $subject = sanitize_text_field($_POST['em_smtp_relay_email_subject'] ?? '');
-        $message = sanitize_textarea_field($_POST['em_smtp_relay_email_body'] ?? '');
+        $subject = sanitize_text_field($_POST['em_smtp_relay_email_subject'] ?? 'Emercury SMTP Test Email');
+        $message = wp_kses_post($_POST['em_smtp_relay_email_body'] ?? 'If you receive this email, Emercury SMTP is working correctly.');
 
         if (!$this->validateRecipient($to)) {
-            $this->displayError(__('Please enter a valid email address.', 'em-smtp-relay'));
+            $this->notifier->addError(
+                __('Please enter a valid email address.', 'em-smtp-relay')
+            );
             return;
         }
 
         if (!$this->validateSmtpConfiguration()) {
-            $this->displayError(__('Please setup SMTP settings first.', 'em-smtp-relay'));
+            $this->notifier->addError(
+                __('Please setup SMTP settings first.', 'em-smtp-relay')
+            );
             return;
         }
 
@@ -77,9 +85,9 @@ class TestEmailTab
     {
         $data = $this->config->getGeneralSettings();
 
-        return !empty($data['em_smtp_username'])
-            && !empty($data['em_smtp_password'])
-            && !empty($data['em_smtp_from_email']);
+        return !empty($data->smtpUsername)
+            && !empty($data->smtpPassword)
+            && !empty($data->fromEmail);
     }
 
     private function sendTestEmail(string $to, string $subject, string $message): void
@@ -91,23 +99,9 @@ class TestEmailTab
         }
 
         if (wp_mail($to, $subject, $message, $headers)) {
-            $this->displaySuccess(__('Test email has been sent successfully!', 'em-smtp-relay'));
+            $this->notifier->addSuccess(__('Test email has been sent successfully!', 'em-smtp-relay'));
         } else {
-            $this->displayError(__('Failed to send test email. Please check your settings.', 'em-smtp-relay'));
+            $this->notifier->addError(__('Failed to send test email. Please check your settings.', 'em-smtp-relay'));
         }
-    }
-
-    private function displayError(string $message): void
-    {
-        echo ''
-            . esc_html($message)
-            . '';
-    }
-
-    private function displaySuccess(string $message): void
-    {
-        echo ''
-            . esc_html($message)
-            . '';
     }
 }
