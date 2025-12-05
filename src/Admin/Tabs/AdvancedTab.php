@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Admin\Tabs;
 
 use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
-use Emercury\Smtp\Security\Validator;
-use Emercury\Smtp\Security\NonceManager;
-use Emercury\Smtp\Config\Config;
+use Emercury\Smtp\Contracts\ConfigInterface;
+use Emercury\Smtp\Contracts\NonceManagerInterface;
+use Emercury\Smtp\Contracts\ValidatorInterface;
 use Emercury\Smtp\Admin\AdminNotifier;
 
 class AdvancedTab
 {
-    private Validator $validator;
-    private NonceManager $nonceManager;
-    private Config $config;
+    private ValidatorInterface $validator;
+    private NonceManagerInterface $nonceManager;
+    private ConfigInterface $config;
     private AdminNotifier $notifier;
 
     public function __construct(
-        Validator $validator,
-        NonceManager $nonceManager,
-        Config $config,
+        ValidatorInterface $validator,
+        NonceManagerInterface $nonceManager,
+        ConfigInterface $config,
         AdminNotifier $notifier
     ) {
         $this->validator = $validator;

@@ -6,8 +6,10 @@ namespace Emercury\Smtp\Core;
 
 use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
 use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
-use Emercury\Smtp\Security\Encryption;
-use Emercury\Smtp\Security\Validator;
+use Emercury\Smtp\Contracts\EmailLoggerInterface;
+use Emercury\Smtp\Contracts\EncryptionInterface;
+use Emercury\Smtp\Contracts\ConfigInterface;
+use Emercury\Smtp\Contracts\LoggerInterface;
 use Emercury\Smtp\Config\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
@@ -15,18 +17,21 @@ use WP_Error;
 
 class Mailer
 {
-    private Encryption $encryption;
-    private Validator $validator;
-    private Config $config;
+    private EncryptionInterface $encryption;
+    private ConfigInterface $config;
+    private LoggerInterface $logger;
+    private EmailLoggerInterface $emailLogger;
 
     public function __construct(
-        Encryption $encryption,
-        Validator $validator,
-        Config $config
+        EncryptionInterface $encryption,
+        ConfigInterface $config,
+        EmailLoggerInterface $emailLogger,
+        LoggerInterface $logger
     ) {
         $this->encryption = $encryption;
-        $this->validator = $validator;
         $this->config = $config;
+        $this->logger = $logger;
+        $this->emailLogger = $emailLogger;
     }
 
     public function sendMail($return, array $atts)
@@ -151,11 +156,21 @@ class Mailer
             $result = $phpmailer->send();
 
             if ($result) {
+                $this->emailLogger->logSent([
+                    'to' => $atts['to'] ?? '',
+                    'subject' => $atts['subject'] ?? '',
+                ]);
+
                 do_action('wp_mail_succeeded', $atts);
             }
 
             return $result;
         } catch (PHPMailerException $e) {
+            $this->emailLogger->logFailed([
+                'to' => $atts['to'] ?? '',
+                'subject' => $atts['subject'] ?? '',
+            ], $e->getMessage());
+
             do_action('wp_mail_failed', new WP_Error(
                 'wp_mail_failed',
                 $e->getMessage(),
@@ -356,14 +371,8 @@ class Mailer
 
     private function logError(string $message, ?\Exception $exception = null, array $context = []): void
     {
-        if (!defined('WP_DEBUG') || !WP_DEBUG) {
-            return;
-        }
-
-        $logMessage = sprintf('Emercury SMTP Error: %s', $message);
-
         if ($exception !== null) {
-            $logMessage .= sprintf(
+            $message .= sprintf(
                 ' | Exception: %s in %s:%d',
                 $exception->getMessage(),
                 $exception->getFile(),
@@ -371,13 +380,6 @@ class Mailer
             );
         }
 
-        if (!empty($context)) {
-            $logMessage .= ' | Context: ' . json_encode([
-                    'to' => $context['to'] ?? 'unknown',
-                    'subject' => $context['subject'] ?? 'unknown'
-                ]);
-        }
-
-        error_log($logMessage);
+        $this->logger->error($message, $context);
     }
 }

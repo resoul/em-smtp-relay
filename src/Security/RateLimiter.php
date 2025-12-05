@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Security;
 
-class RateLimiter
+use Emercury\Smtp\Contracts\RateLimiterInterface;
+
+class RateLimiter implements RateLimiterInterface
 {
     private const OPTION_PREFIX = 'em_smtp_rate_limit_';
     private const MAX_ATTEMPTS = 10;

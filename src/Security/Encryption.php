@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Security;
 
-class Encryption
+use Emercury\Smtp\Contracts\EncryptionInterface;
+
+class Encryption implements EncryptionInterface
 {
     private const CIPHER_METHOD = 'AES-256-CBC';
 

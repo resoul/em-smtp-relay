@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Core;
 
+use Emercury\Smtp\Admin\DashboardWidget;
 use Emercury\Smtp\Admin\SettingsPage;
+use Emercury\Smtp\Contracts\EmailLoggerInterface;
 
 class Plugin
 {
@@ -19,6 +21,7 @@ class Plugin
     {
         $this->loadTextDomain();
         $this->registerHooks();
+        $this->scheduleCleanup();
     }
 
     private function loadTextDomain(): void
@@ -53,5 +56,20 @@ class Plugin
             $settingsPage,
             'addActionLinks'
         ]);
+
+        $dashboardWidget = $this->container->get(DashboardWidget::class);
+        $dashboardWidget->register();
+    }
+
+    private function scheduleCleanup(): void
+    {
+        if (!wp_next_scheduled('em_smtp_cleanup_logs')) {
+            wp_schedule_event(time(), 'daily', 'em_smtp_cleanup_logs');
+        }
+
+        add_action('em_smtp_cleanup_logs', function() {
+            $emailLogger = $this->container->get(EmailLoggerInterface::class);
+            $emailLogger->clearOldLogs(30);
+        });
     }
 }

@@ -6,8 +6,9 @@ namespace Emercury\Smtp\Config;
 
 use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
 use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
+use Emercury\Smtp\Contracts\ConfigInterface;
 
-class Config
+class Config implements ConfigInterface
 {
     public const SMTP_HOST = 'smtp.emercury.net';
     public const OPTION_GENERAL = 'em_smtp_relay_data';

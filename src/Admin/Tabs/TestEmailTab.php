@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
-use Emercury\Smtp\Security\NonceManager;
-use Emercury\Smtp\Config\Config;
-use Emercury\Smtp\Security\RateLimiter;
+use Emercury\Smtp\Contracts\ConfigInterface;
+use Emercury\Smtp\Contracts\NonceManagerInterface;
+use Emercury\Smtp\Contracts\RateLimiterInterface;
 use Emercury\Smtp\Admin\AdminNotifier;
 
 class TestEmailTab
 {
-    private NonceManager $nonceManager;
-    private Config $config;
-    private RateLimiter $rateLimiter;
+    private NonceManagerInterface $nonceManager;
+    private ConfigInterface $config;
+    private RateLimiterInterface $rateLimiter;
     private AdminNotifier $notifier;
 
     public function __construct(
-        NonceManager $nonceManager,
-        Config $config,
-        RateLimiter $rateLimiter,
+        NonceManagerInterface $nonceManager,
+        ConfigInterface $config,
+        RateLimiterInterface $rateLimiter,
         AdminNotifier $notifier
     ) {
         $this->nonceManager = $nonceManager;

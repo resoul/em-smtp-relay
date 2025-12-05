@@ -5,28 +5,28 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Admin\Tabs;
 
 use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
-use Emercury\Smtp\Security\Encryption;
-use Emercury\Smtp\Security\Validator;
-use Emercury\Smtp\Security\NonceManager;
-use Emercury\Smtp\Config\Config;
-use Emercury\Smtp\Security\RateLimiter;
+use Emercury\Smtp\Contracts\ConfigInterface;
+use Emercury\Smtp\Contracts\EncryptionInterface;
+use Emercury\Smtp\Contracts\NonceManagerInterface;
+use Emercury\Smtp\Contracts\RateLimiterInterface;
+use Emercury\Smtp\Contracts\ValidatorInterface;
 use Emercury\Smtp\Admin\AdminNotifier;
 
 class GeneralTab
 {
-    private Encryption $encryption;
-    private Validator $validator;
-    private NonceManager $nonceManager;
-    private Config $config;
-    private RateLimiter $rateLimiter;
+    private EncryptionInterface $encryption;
+    private ValidatorInterface $validator;
+    private NonceManagerInterface $nonceManager;
+    private ConfigInterface $config;
+    private RateLimiterInterface $rateLimiter;
     private AdminNotifier $notifier;
 
     public function __construct(
-        Encryption $encryption,
-        Validator $validator,
-        NonceManager $nonceManager,
-        Config $config,
-        RateLimiter $rateLimiter,
+        EncryptionInterface $encryption,
+        ValidatorInterface $validator,
+        NonceManagerInterface $nonceManager,
+        ConfigInterface $config,
+        RateLimiterInterface $rateLimiter,
         AdminNotifier $notifier
     ) {
         $this->encryption = $encryption;

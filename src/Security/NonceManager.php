@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Security;
 
-class NonceManager
+use Emercury\Smtp\Contracts\NonceManagerInterface;
+
+class NonceManager implements NonceManagerInterface
 {
     public function verify(string $action, string $name = '_wpnonce'): bool
     {

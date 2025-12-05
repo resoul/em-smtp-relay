@@ -6,8 +6,9 @@ namespace Emercury\Smtp\Security;
 
 use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
 use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
+use Emercury\Smtp\Contracts\ValidatorInterface;
 
-class Validator
+class Validator implements ValidatorInterface
 {
     public function validateEmail(string $email): bool
     {
