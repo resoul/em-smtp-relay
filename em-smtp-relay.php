@@ -1,0 +1,49 @@
+<?php
+/**
+ * Plugin Name: Emercury SMTP Mail
+ * Plugin URI: https://emercury.net
+ * Description: Send emails from your WordPress site using Emercury SMTP.
+ * Version: 1.1.0
+ * Requires at least: 5.8
+ * Requires PHP: 7.4
+ * Author: Emercury Team
+ * Author URI: https://emercury.net
+ * Text Domain: em-smtp-relay
+ * Domain Path: /languages
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ */
+
+declare(strict_types=1);
+
+// Prevent direct access
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Define constants
+define('EM_SMTP_VERSION', '1.0.0');
+define('EM_SMTP_FILE', __FILE__);
+define('EM_SMTP_PATH', plugin_dir_path(__FILE__));
+define('EM_SMTP_URL', plugin_dir_url(__FILE__));
+define('EM_SMTP_BASENAME', plugin_basename(__FILE__));
+
+// PSR-4 Autoloader
+require_once __DIR__ . '/autoload.php';
+
+// Bootstrap the plugin
+add_action('plugins_loaded', function () {
+    $container = new Emercury\Smtp\Core\Container();
+    $plugin = new Emercury\Smtp\Core\Plugin($container);
+    $plugin->init();
+});
+
+// Activation hook
+register_activation_hook(__FILE__, function () {
+    // Future: Add activation logic
+});
+
+// Deactivation hook
+register_deactivation_hook(__FILE__, function () {
+    // Future: Add deactivation logic
+});
