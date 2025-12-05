@@ -68,8 +68,8 @@ class Validator
     public function sanitizeAdvancedSettings(AdvancedSettingsDTO $data): void
     {
         $data->forceReplyTo = !empty($data->forceReplyTo);
-        $data->forceCc = !empty($data->forceReplyTo);
-        $data->forceBcc = !empty($data->forceReplyTo);
+        $data->forceCc = !empty($data->forceCc);
+        $data->forceBcc = !empty($data->forceBcc);
         $data->replyToEmail = sanitize_email($data->replyToEmail);
         $data->ccEmail = sanitize_email($data->ccEmail);
         $data->bccEmail = sanitize_email($data->bccEmail);

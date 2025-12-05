@@ -60,6 +60,8 @@ class Mailer
             empty($settings->smtpPassword) ||
             empty($settings->fromEmail)) {
 
+            $this->logError('SMTP settings not configured');
+
             do_action('wp_mail_failed', new WP_Error(
                 'wp_mail_failed',
                 'SMTP settings not configured'
@@ -350,5 +352,32 @@ class Mailer
         $phpmailer->clearReplyTos();
         $phpmailer->Body = '';
         $phpmailer->AltBody = '';
+    }
+
+    private function logError(string $message, ?\Exception $exception = null, array $context = []): void
+    {
+        if (!defined('WP_DEBUG') || !WP_DEBUG) {
+            return;
+        }
+
+        $logMessage = sprintf('Emercury SMTP Error: %s', $message);
+
+        if ($exception !== null) {
+            $logMessage .= sprintf(
+                ' | Exception: %s in %s:%d',
+                $exception->getMessage(),
+                $exception->getFile(),
+                $exception->getLine()
+            );
+        }
+
+        if (!empty($context)) {
+            $logMessage .= ' | Context: ' . json_encode([
+                    'to' => $context['to'] ?? 'unknown',
+                    'subject' => $context['subject'] ?? 'unknown'
+                ]);
+        }
+
+        error_log($logMessage);
     }
 }
