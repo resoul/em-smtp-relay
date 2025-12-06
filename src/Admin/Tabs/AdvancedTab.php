@@ -27,14 +27,20 @@ class AdvancedTab
         $this->nonceManager = $nonceManager;
         $this->config = $config;
         $this->notifier = $notifier;
+        $this->init();
+    }
+
+    protected function init(): void
+    {
+        add_action('admin_init', function () {
+            if (isset($_POST['em_smtp_relay_update_advanced_settings'])) {
+                $this->handleFormSubmission();
+            }
+        });
     }
 
     public function render(): void
     {
-        if (isset($_POST['em_smtp_relay_update_advanced_settings'])) {
-            $this->handleFormSubmission();
-        }
-
         $data = $this->config->getAdvancedSettings();
 
         include EM_SMTP_PATH . 'templates/admin/advanced-tab.php';
@@ -51,15 +57,15 @@ class AdvancedTab
         }
 
         $dto = new AdvancedSettingsDTO(
-            $_POST['reply_to_email'],
-            $_POST['reply_to_name'],
-            $_POST['force_reply_to'] ?? 0,
-            $_POST['cc_email'],
-            $_POST['cc_name'],
-            $_POST['force_cc'] ?? 0,
-            $_POST['bcc_email'],
-            $_POST['bcc_name'],
-            $_POST['force_bcc'] ?? 0,
+            $_POST['reply_to_email'] ?? '',
+            $_POST['reply_to_name'] ?? '',
+            isset($_POST['force_reply_to']) ? (int)$_POST['force_reply_to'] : 0,
+            $_POST['cc_email'] ?? '',
+            $_POST['cc_name'] ?? '',
+            isset($_POST['force_cc']) ? (int)$_POST['force_cc'] : 0,
+            $_POST['bcc_email'] ?? '',
+            $_POST['bcc_name'] ?? '',
+            isset($_POST['force_bcc']) ? (int)$_POST['force_bcc'] : 0,
         );
 
         $errors = $this->validator->validateAdvancedSettings($dto);

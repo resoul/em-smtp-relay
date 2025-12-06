@@ -35,14 +35,20 @@ class GeneralTab
         $this->config = $config;
         $this->rateLimiter = $rateLimiter;
         $this->notifier = $notifier;
+        $this->init();
+    }
+
+    protected function init(): void
+    {
+        add_action('admin_init', function () {
+            if (isset($_POST['em_smtp_relay_update_settings'])) {
+                $this->handleSubmit();
+            }
+        });
     }
 
     public function render(): void
     {
-        if (isset($_POST['em_smtp_relay_update_settings'])) {
-            $this->handleSubmit();
-        }
-
         $data = $this->config->getGeneralSettings();
 
         include EM_SMTP_PATH . 'templates/admin/general-tab.php';
@@ -72,9 +78,8 @@ class GeneralTab
             $_POST['encryption'],
             $_POST['from_email'],
             $_POST['from_name'],
-            $_POST['force_from_address'],
+            isset($_POST['force_from_address']) ? (int) $_POST['force_from_address'] : 0,
         );
-        $this->validator->sanitizeSettings($dto);
         $errors = $this->validator->validateSmtpSettings($dto);
 
         if (!empty($errors)) {
@@ -82,6 +87,7 @@ class GeneralTab
             return;
         }
 
+        $this->validator->sanitizeSettings($dto);
         $this->saveSettings($dto);
     }
 

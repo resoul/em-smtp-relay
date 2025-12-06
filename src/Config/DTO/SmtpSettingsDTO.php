@@ -14,7 +14,7 @@ class SmtpSettingsDTO
     public string $smtpEncryption;
     public string $fromEmail;
     public string $fromName;
-    public bool $forceFromAddress;
+    public int $forceFromAddress;
     public int $smtpPort;
     private string $smtpHost = Config::SMTP_HOST;
     private string $smtpAuth = 'true';
@@ -25,7 +25,7 @@ class SmtpSettingsDTO
         string $smtpEncryption = 'tls',
         string $fromEmail = '',
         string $fromName = '',
-        bool $forceFromAddress = false,
+        int $forceFromAddress = 0,
         int $smtpPort = 0
     ) {
         $this->smtpUsername     = $smtpUsername;
@@ -45,7 +45,7 @@ class SmtpSettingsDTO
             $data[SettingKeys::ENCRYPTION] ?? 'tls',
             $data[SettingKeys::FROM_EMAIL] ?? '',
             $data[SettingKeys::FROM_NAME] ?? '',
-            (bool) ($data[SettingKeys::FORCE_FROM_ADDRESS] ?? false),
+           $data[SettingKeys::FORCE_FROM_ADDRESS] ?? 0,
             (int) ($data[SettingKeys::PORT] ?? 0)
         );
     }
@@ -58,7 +58,7 @@ class SmtpSettingsDTO
             SettingKeys::ENCRYPTION => $this->smtpEncryption,
             SettingKeys::FROM_EMAIL => $this->fromEmail,
             SettingKeys::FROM_NAME => $this->fromName,
-            SettingKeys::FORCE_FROM_ADDRESS => (int) $this->forceFromAddress,
+            SettingKeys::FORCE_FROM_ADDRESS => $this->forceFromAddress,
             SettingKeys::HOST => $this->smtpHost,
             SettingKeys::AUTH => $this->smtpAuth,
             SettingKeys::PORT => $this->smtpPort,

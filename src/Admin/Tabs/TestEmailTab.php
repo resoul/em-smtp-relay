@@ -28,14 +28,20 @@ class TestEmailTab
         $this->config = $config;
         $this->rateLimiter = $rateLimiter;
         $this->notifier = $notifier;
+        $this->init();
+    }
+
+    protected function init(): void
+    {
+        add_action('admin_init', function () {
+            if (isset($_POST['em_smtp_relay_send_test_email'])) {
+                $this->handleTestEmail();
+            }
+        });
     }
 
     public function render(): void
     {
-        if (isset($_POST['em_smtp_relay_send_test_email'])) {
-            $this->handleTestEmail();
-        }
-
         $uploadedFiles = $this->getUploadedTestFiles();
 
         include EM_SMTP_PATH . 'templates/admin/test-email-tab.php';
@@ -43,7 +49,7 @@ class TestEmailTab
 
     private function handleTestEmail(): void
     {
-        if (!$this->nonceManager->verifyWithCapability('em_smtp_relay_test_email', 'manage_options')) {
+        if (!$this->nonceManager->verifyWithCapability('em_smtp_relay_test_email')) {
             wp_die(
                 esc_html__('Security check failed. Please try again.', 'em-smtp-relay'),
                 esc_html__('Security Error', 'em-smtp-relay'),
@@ -65,7 +71,7 @@ class TestEmailTab
 
         if (!$this->validateRecipient($to)) {
             $this->notifier->addError(
-                __('Please enter a valid email address.', 'em-smtp-relay')
+                __('Please enter a valid recipient email address.', 'em-smtp-relay')
             );
             return;
         }
