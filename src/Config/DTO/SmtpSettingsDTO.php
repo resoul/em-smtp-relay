@@ -6,6 +6,7 @@ namespace Emercury\Smtp\Config\DTO;
 
 use Emercury\Smtp\Config\Config;
 use Emercury\Smtp\Config\SettingKeys;
+use Emercury\Smtp\Core\RequestHandler;
 
 class SmtpSettingsDTO
 {
@@ -47,6 +48,21 @@ class SmtpSettingsDTO
             $data[SettingKeys::FROM_NAME] ?? '',
            $data[SettingKeys::FORCE_FROM_ADDRESS] ?? 0,
             (int) ($data[SettingKeys::PORT] ?? 0)
+        );
+    }
+
+    public static function fromRequest(RequestHandler $request): self
+    {
+        $smtpEncryption = $request->getString(SettingKeys::ENCRYPTION, 'tls');
+
+        return new self(
+            $request->getEmail(SettingKeys::USERNAME),
+            $request->getString(SettingKeys::PASSWORD),
+            $smtpEncryption,
+            $request->getEmail(SettingKeys::FROM_EMAIL),
+            $request->getString(SettingKeys::FROM_NAME),
+            $request->getInt(SettingKeys::FORCE_FROM_ADDRESS),
+            $request->getInt(SettingKeys::PORT, $smtpEncryption === 'ssl' ? 465 : 587),
         );
     }
 

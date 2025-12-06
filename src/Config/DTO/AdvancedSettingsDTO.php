@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Config\DTO;
 
 use Emercury\Smtp\Config\SettingKeys;
+use Emercury\Smtp\Core\RequestHandler;
 
 class AdvancedSettingsDTO
 {
@@ -52,6 +53,21 @@ class AdvancedSettingsDTO
             $data[SettingKeys::BCC_EMAIL] ?? '',
             $data[SettingKeys::BCC_NAME] ?? '',
             $data[SettingKeys::FORCE_BCC] ?? 0,
+        );
+    }
+
+    public static function fromRequest(RequestHandler $request): self
+    {
+        return new self(
+            $request->getString(SettingKeys::REPLY_TO_EMAIL),
+            $request->getString(SettingKeys::REPLY_TO_NAME),
+            $request->getInt(SettingKeys::FORCE_REPLY_TO),
+            $request->getString(SettingKeys::CC_EMAIL),
+            $request->getString(SettingKeys::CC_NAME),
+            $request->getInt(SettingKeys::FORCE_CC),
+            $request->getString(SettingKeys::BCC_EMAIL),
+            $request->getString(SettingKeys::BCC_NAME),
+            $request->getInt(SettingKeys::FORCE_BCC),
         );
     }
 

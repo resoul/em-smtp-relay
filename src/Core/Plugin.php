@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Core;
 
-use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\Admin\DashboardWidget;
 use Emercury\Smtp\Admin\SettingsPage;
 use Emercury\Smtp\Admin\Tabs\TestEmailTab;

@@ -5,12 +5,12 @@
         <tbody>
         <tr valign="top">
             <th scope="row">
-                <label for="smtp_username">
+                <label for="em_smtp_username">
                     <?php _e('SMTP Username', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <input name="smtp_username" type="text" id="smtp_username" value="<?php echo esc_attr($data->smtpUsername); ?>" class="regular-text code">
+                <input name="em_smtp_username" type="text" id="em_smtp_username" value="<?php echo esc_attr($data->smtpUsername); ?>" class="regular-text code">
                 <p class="description">
                     <?php _e('SMTP Username.', 'em-smtp-relay');?>
                 </p>
@@ -18,12 +18,12 @@
         </tr>
         <tr valign="top">
             <th scope="row">
-                <label for="smtp_password">
+                <label for="em_smtp_password">
                     <?php _e('SMTP Password (Token)', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <input name="smtp_password" type="password" id="smtp_password" value="" class="regular-text code">
+                <input name="em_smtp_password" type="password" id="em_smtp_password" value="" class="regular-text code">
                 <p class="description">
                     <?php _e('Your SMTP Password (The saved password is hidden for security reasons. Leave this field empty if you don\'t want to change the saved password while updating other settings).', 'em-smtp-relay');?>
                 </p>

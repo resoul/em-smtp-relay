@@ -9,6 +9,7 @@ use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\ValidatorInterface;
 use Emercury\Smtp\Admin\AdminNotifier;
+use Emercury\Smtp\Core\RequestHandler;
 
 class AdvancedTab
 {
@@ -16,24 +17,27 @@ class AdvancedTab
     private NonceManagerInterface $nonceManager;
     private ConfigInterface $config;
     private AdminNotifier $notifier;
+    private RequestHandler $request;
 
     public function __construct(
         ValidatorInterface $validator,
         NonceManagerInterface $nonceManager,
         ConfigInterface $config,
+        RequestHandler $request,
         AdminNotifier $notifier
     ) {
         $this->validator = $validator;
         $this->nonceManager = $nonceManager;
         $this->config = $config;
         $this->notifier = $notifier;
+        $this->request = $request;
         $this->init();
     }
 
     protected function init(): void
     {
         add_action('admin_init', function () {
-            if (isset($_POST['em_smtp_relay_update_advanced_settings'])) {
+            if ($this->request->has('em_smtp_relay_update_advanced_settings')) {
                 $this->handleFormSubmission();
             }
         });
@@ -56,18 +60,7 @@ class AdvancedTab
             );
         }
 
-        $dto = new AdvancedSettingsDTO(
-            $_POST['reply_to_email'] ?? '',
-            $_POST['reply_to_name'] ?? '',
-            isset($_POST['force_reply_to']) ? (int)$_POST['force_reply_to'] : 0,
-            $_POST['cc_email'] ?? '',
-            $_POST['cc_name'] ?? '',
-            isset($_POST['force_cc']) ? (int)$_POST['force_cc'] : 0,
-            $_POST['bcc_email'] ?? '',
-            $_POST['bcc_name'] ?? '',
-            isset($_POST['force_bcc']) ? (int)$_POST['force_bcc'] : 0,
-        );
-
+        $dto = AdvancedSettingsDTO::fromRequest($this->request);
         $errors = $this->validator->validateAdvancedSettings($dto);
 
         if (!empty($errors)) {
@@ -75,7 +68,6 @@ class AdvancedTab
             return;
         }
 
-        $this->validator->sanitizeAdvancedSettings($dto);
         $this->config->saveAdvancedSettings($dto);
 
         $this->notifier->addSuccess(__('Settings Saved!', 'em-smtp-relay'));

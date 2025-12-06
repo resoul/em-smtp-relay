@@ -67,6 +67,8 @@ class Container
 
         $this->singleton(AdminNotifier::class, fn() => new AdminNotifier());
 
+        $this->singleton(RequestHandler::class, fn() => new RequestHandler());
+
         $this->singleton(DashboardWidget::class, fn() => new DashboardWidget(
             $this->get(EmailStatisticsInterface::class),
             $this->get(ConfigInterface::class)
@@ -85,13 +87,15 @@ class Container
             $this->get(NonceManagerInterface::class),
             $this->get(ConfigInterface::class),
             $this->get(RateLimiterInterface::class),
-            $this->get(AdminNotifier::class)
+            $this->get(AdminNotifier::class),
+            $this->get(RequestHandler::class),
         ));
 
         $this->singleton(AdvancedTab::class, fn() => new AdvancedTab(
             $this->get(ValidatorInterface::class),
             $this->get(NonceManagerInterface::class),
             $this->get(ConfigInterface::class),
+            $this->get(RequestHandler::class),
             $this->get(AdminNotifier::class)
         ));
 

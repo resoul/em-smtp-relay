@@ -72,7 +72,7 @@ class ConfigManagerTab
 
         unset($exportData['general']['em_smtp_password']);
 
-        $filename = 'emercury-smtp-config-' . date('Y-m-d-H-i-s') . '.json';
+        $filename = 'emercury-smtp-config.json';
 
         header('Content-Type: application/json');
         header('Content-Disposition: attachment; filename="' . $filename . '"');

@@ -11,6 +11,7 @@ use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\RateLimiterInterface;
 use Emercury\Smtp\Contracts\ValidatorInterface;
 use Emercury\Smtp\Admin\AdminNotifier;
+use Emercury\Smtp\Core\RequestHandler;
 
 class GeneralTab
 {
@@ -20,6 +21,7 @@ class GeneralTab
     private ConfigInterface $config;
     private RateLimiterInterface $rateLimiter;
     private AdminNotifier $notifier;
+    private RequestHandler $request;
 
     public function __construct(
         EncryptionInterface $encryption,
@@ -27,7 +29,8 @@ class GeneralTab
         NonceManagerInterface $nonceManager,
         ConfigInterface $config,
         RateLimiterInterface $rateLimiter,
-        AdminNotifier $notifier
+        AdminNotifier $notifier,
+        RequestHandler $request
     ) {
         $this->encryption = $encryption;
         $this->validator = $validator;
@@ -35,13 +38,14 @@ class GeneralTab
         $this->config = $config;
         $this->rateLimiter = $rateLimiter;
         $this->notifier = $notifier;
+        $this->request = $request;
         $this->init();
     }
 
     protected function init(): void
     {
         add_action('admin_init', function () {
-            if (isset($_POST['em_smtp_relay_update_settings'])) {
+            if ($this->request->has('em_smtp_relay_update_settings')) {
                 $this->handleSubmit();
             }
         });
@@ -72,14 +76,7 @@ class GeneralTab
             return;
         }
 
-        $dto = new SmtpSettingsDTO(
-            $_POST['smtp_username'],
-            $_POST['smtp_password'],
-            $_POST['encryption'],
-            $_POST['from_email'],
-            $_POST['from_name'],
-            isset($_POST['force_from_address']) ? (int) $_POST['force_from_address'] : 0,
-        );
+        $dto = SmtpSettingsDTO::fromRequest($this->request);
         $errors = $this->validator->validateSmtpSettings($dto);
 
         if (!empty($errors)) {
@@ -87,7 +84,6 @@ class GeneralTab
             return;
         }
 
-        $this->validator->sanitizeSettings($dto);
         $this->saveSettings($dto);
     }
 

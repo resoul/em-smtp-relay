@@ -38,15 +38,6 @@ class Validator implements ValidatorInterface
         return $errors;
     }
 
-    public function sanitizeSettings(SmtpSettingsDTO $data): void
-    {
-        $data->smtpUsername = sanitize_text_field($data->smtpUsername);
-        $data->smtpEncryption = sanitize_text_field($data->smtpEncryption);
-        $data->forceFromAddress = !empty($data->forceFromAddress);
-        $data->fromEmail = sanitize_email($data->fromEmail);
-        $data->fromName = sanitize_text_field($data->fromName);
-    }
-
     public function validateAdvancedSettings(AdvancedSettingsDTO $data): array
     {
         $errors = [];
@@ -64,18 +55,5 @@ class Validator implements ValidatorInterface
         }
 
         return $errors;
-    }
-
-    public function sanitizeAdvancedSettings(AdvancedSettingsDTO $data): void
-    {
-        $data->forceReplyTo = !empty($data->forceReplyTo);
-        $data->forceCc = !empty($data->forceCc);
-        $data->forceBcc = !empty($data->forceBcc);
-        $data->replyToEmail = sanitize_email($data->replyToEmail);
-        $data->ccEmail = sanitize_email($data->ccEmail);
-        $data->bccEmail = sanitize_email($data->bccEmail);
-        $data->replyToName = sanitize_text_field($data->replyToName);
-        $data->bccName = sanitize_text_field($data->bccName);
-        $data->ccName = sanitize_text_field($data->ccName);
     }
 }
