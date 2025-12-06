@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Config;
 
-use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
-use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
+use Emercury\Smtp\Config\DTO\AdvancedSettingsDTO;
+use Emercury\Smtp\Config\DTO\SmtpSettingsDTO;
 use Emercury\Smtp\Contracts\ConfigInterface;
 
 class Config implements ConfigInterface

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
-use Emercury\Smtp\Config\Dto\SmtpSettingsDTO;
+use Emercury\Smtp\Config\DTO\SmtpSettingsDTO;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\EncryptionInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;

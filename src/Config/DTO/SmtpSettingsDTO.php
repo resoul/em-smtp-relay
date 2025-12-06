@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Emercury\Smtp\Config\Dto;
+namespace Emercury\Smtp\Config\DTO;
 
 use Emercury\Smtp\Config\Config;
 use Emercury\Smtp\Config\SettingKeys;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
-use Emercury\Smtp\Config\Dto\AdvancedSettingsDTO;
+use Emercury\Smtp\Config\DTO\AdvancedSettingsDTO;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\ValidatorInterface;
@@ -37,7 +37,7 @@ class AdvancedTab
 
         $data = $this->config->getAdvancedSettings();
 
-        include EM_SMTP_PATH . 'templates/advanced-tab.php';
+        include EM_SMTP_PATH . 'templates/admin/advanced-tab.php';
     }
 
     private function handleFormSubmission(): void

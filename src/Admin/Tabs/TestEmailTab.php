@@ -34,7 +34,7 @@ class TestEmailTab
             $this->handleTestEmail();
         }
 
-        include EM_SMTP_PATH . 'templates/test-email-tab.php';
+        include EM_SMTP_PATH . 'templates/admin/test-email-tab.php';
     }
 
     private function handleTestEmail(): void
