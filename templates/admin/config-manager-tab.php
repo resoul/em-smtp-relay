@@ -87,6 +87,7 @@
 <style>
     .em-smtp-config-manager {
         max-width: 800px;
+        padding-top: 15px;
     }
 
     .em-smtp-section {

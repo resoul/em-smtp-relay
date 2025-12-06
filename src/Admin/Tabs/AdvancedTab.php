@@ -53,13 +53,13 @@ class AdvancedTab
         $dto = new AdvancedSettingsDTO(
             $_POST['reply_to_email'],
             $_POST['reply_to_name'],
-            $_POST['force_reply_to'],
+            $_POST['force_reply_to'] ?? 0,
             $_POST['cc_email'],
             $_POST['cc_name'],
-            $_POST['force_cc'],
+            $_POST['force_cc'] ?? 0,
             $_POST['bcc_email'],
             $_POST['bcc_name'],
-            $_POST['force_bcc']
+            $_POST['force_bcc'] ?? 0,
         );
 
         $errors = $this->validator->validateAdvancedSettings($dto);

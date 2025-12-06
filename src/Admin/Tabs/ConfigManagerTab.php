@@ -22,18 +22,24 @@ class ConfigManagerTab
         $this->config = $config;
         $this->nonceManager = $nonceManager;
         $this->notifier = $notifier;
+        $this->init();
+    }
+
+    protected function init(): void
+    {
+        add_action('admin_init', function () {
+            if (isset($_POST['em_smtp_relay_export_config'])) {
+                $this->handleExport();
+            }
+
+            if (isset($_POST['em_smtp_relay_import_config'])) {
+                $this->handleImport();
+            }
+        });
     }
 
     public function render(): void
     {
-        if (isset($_POST['em_smtp_relay_export_config'])) {
-            $this->handleExport();
-        }
-
-        if (isset($_POST['em_smtp_relay_import_config'])) {
-            $this->handleImport();
-        }
-
         include EM_SMTP_PATH . 'templates/admin/config-manager-tab.php';
     }
 

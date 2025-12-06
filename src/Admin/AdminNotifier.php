@@ -8,7 +8,7 @@ class AdminNotifier
 {
     private const NOTICE_PREFIX = 'em-smtp-relay-';
 
-    public function __construct()
+    public function __constructor()
     {
         add_action('admin_notices', [$this, 'displayNotices']);
     }

@@ -51,15 +51,15 @@ class Validator implements ValidatorInterface
     {
         $errors = [];
 
-        if (!empty($data->replyToEmail) && !$this->validateEmail($data->replyToEmail)) {
+        if (empty($data->replyToEmail) || !$this->validateEmail($data->replyToEmail)) {
             $errors[] = __('Invalid Reply-To Email Address', 'em-smtp-relay');
         }
 
-        if (!empty($data->ccEmail) && !$this->validateEmail($data->ccEmail)) {
+        if (empty($data->ccEmail) || !$this->validateEmail($data->ccEmail)) {
             $errors[] = __('Invalid CC Email Address', 'em-smtp-relay');
         }
 
-        if (!empty($data->bccEmail) && !$this->validateEmail($data->bccEmail)) {
+        if (empty($data->bccEmail) || !$this->validateEmail($data->bccEmail)) {
             $errors[] = __('Invalid BCC Email Address', 'em-smtp-relay');
         }
 

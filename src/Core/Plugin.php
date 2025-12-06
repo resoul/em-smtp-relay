@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Core;
 
+use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\Admin\DashboardWidget;
 use Emercury\Smtp\Admin\SettingsPage;
+use Emercury\Smtp\Admin\Tabs\TestEmailTab;
 use Emercury\Smtp\Contracts\EmailLoggerInterface;
 
 class Plugin
@@ -26,7 +28,7 @@ class Plugin
 
     private function loadTextDomain(): void
     {
-        add_action('plugins_loaded', function () {
+        add_action('init', function () {
             load_plugin_textdomain(
                 'em-smtp-relay',
                 false,
@@ -59,9 +61,10 @@ class Plugin
         $dashboardWidget->register();
 
         add_action('wp_ajax_em_smtp_delete_attachment', function() {
-            $testEmailTab = $this->container->get(\Emercury\Smtp\Admin\Tabs\TestEmailTab::class);
+            $testEmailTab = $this->container->get(TestEmailTab::class);
             $testEmailTab->deleteTestAttachment();
         });
+
     }
 
     private function scheduleCleanup(): void

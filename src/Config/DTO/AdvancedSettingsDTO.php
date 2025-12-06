@@ -10,24 +10,24 @@ class AdvancedSettingsDTO
 {
     public string $replyToEmail;
     public string $replyToName;
-    public bool $forceReplyTo;
+    public int $forceReplyTo;
     public string $ccEmail;
     public string $ccName;
-    public bool $forceCc;
+    public int $forceCc;
     public string $bccEmail;
     public string $bccName;
-    public bool $forceBcc;
+    public int $forceBcc;
 
     public function __construct(
         string $replyToEmail = '',
         string $replyToName = '',
-        bool $forceReplyTo = false,
+        int $forceReplyTo = 0,
         string $ccEmail = '',
         string $ccName = '',
-        bool $forceCc = false,
+        int $forceCc = 0,
         string $bccEmail = '',
         string $bccName = '',
-        bool $forceBcc = false
+        int $forceBcc = 0
     ) {
         $this->replyToEmail = $replyToEmail;
         $this->replyToName = $replyToName;
@@ -45,13 +45,13 @@ class AdvancedSettingsDTO
         return new self(
             $data[SettingKeys::REPLY_TO_EMAIL] ?? '',
             $data[SettingKeys::REPLY_TO_NAME] ?? '',
-            (bool) ($data[SettingKeys::FORCE_REPLY_TO] ?? false),
+            $data[SettingKeys::FORCE_REPLY_TO] ?? 0,
             $data[SettingKeys::CC_EMAIL] ?? '',
             $data[SettingKeys::CC_NAME] ?? '',
-            (bool) ($data[SettingKeys::FORCE_CC] ?? false),
+            $data[SettingKeys::FORCE_CC] ?? 0,
             $data[SettingKeys::BCC_EMAIL] ?? '',
             $data[SettingKeys::BCC_NAME] ?? '',
-            (bool) ($data[SettingKeys::FORCE_BCC] ?? false),
+            $data[SettingKeys::FORCE_BCC] ?? 0,
         );
     }
 
@@ -60,13 +60,13 @@ class AdvancedSettingsDTO
         return [
             SettingKeys::REPLY_TO_EMAIL => $this->replyToEmail,
             SettingKeys::REPLY_TO_NAME => $this->replyToName,
-            SettingKeys::FORCE_REPLY_TO => (int) $this->forceReplyTo,
+            SettingKeys::FORCE_REPLY_TO => $this->forceReplyTo,
             SettingKeys::CC_EMAIL => $this->ccEmail,
             SettingKeys::CC_NAME => $this->ccName,
-            SettingKeys::FORCE_CC => (int) $this->forceCc,
+            SettingKeys::FORCE_CC => $this->forceCc,
             SettingKeys::BCC_EMAIL => $this->bccEmail,
             SettingKeys::BCC_NAME => $this->bccName,
-            SettingKeys::FORCE_BCC => (int) $this->forceBcc,
+            SettingKeys::FORCE_BCC => $this->forceBcc,
         ];
     }
 }
