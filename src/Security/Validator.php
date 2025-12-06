@@ -23,10 +23,6 @@ class Validator implements ValidatorInterface
             $errors[] = __('SMTP Username is required', 'em-smtp-relay');
         }
 
-        if (empty($data->smtpPassword)) {
-            $errors[] = __('SMTP Password is required', 'em-smtp-relay');
-        }
-
         if (!empty($data->fromEmail) && !$this->validateEmail($data->fromEmail)) {
             $errors[] = __('Invalid From Email Address', 'em-smtp-relay');
         }

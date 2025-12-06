@@ -5,12 +5,12 @@
         <tbody>
         <tr valign="top">
             <th scope="row">
-                <label for="em_smtp_username">
+                <label for="em_smtp_relay_username">
                     <?php _e('SMTP Username', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <input name="em_smtp_username" type="text" id="em_smtp_username" value="<?php echo esc_attr($data->smtpUsername); ?>" class="regular-text code">
+                <input name="em_smtp_relay_username" type="text" id="em_smtp_relay_username" value="<?php echo esc_attr($data->smtpUsername); ?>" class="regular-text code">
                 <p class="description">
                     <?php _e('SMTP Username.', 'em-smtp-relay');?>
                 </p>
@@ -18,12 +18,12 @@
         </tr>
         <tr valign="top">
             <th scope="row">
-                <label for="em_smtp_password">
+                <label for="em_smtp_relay_password">
                     <?php _e('SMTP Password (Token)', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <input name="em_smtp_password" type="password" id="em_smtp_password" value="" class="regular-text code">
+                <input name="em_smtp_relay_password" type="password" id="em_smtp_relay_password" value="" class="regular-text code">
                 <p class="description">
                     <?php _e('Your SMTP Password (The saved password is hidden for security reasons. Leave this field empty if you don\'t want to change the saved password while updating other settings).', 'em-smtp-relay');?>
                 </p>
@@ -31,12 +31,12 @@
         </tr>
         <tr>
             <th scope="row">
-                <label for="type_of_encryption">
+                <label for="em_smtp_relay_encryption">
                     <?php _e('Encryption', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <select name="encryption" id="encryption">
+                <select name="em_smtp_relay_encryption" id="em_smtp_relay_encryption">
                     <option value="tls" <?php echo selected( $data->smtpEncryption, 'tls', false );?>><?php _e('STARTTLS', 'em-smtp-relay');?></option>
                     <option value="ssl" <?php echo selected( $data->smtpEncryption, 'ssl', false );?>><?php _e('SSL', 'em-smtp-relay');?></option>
                 </select>
@@ -47,12 +47,12 @@
         </tr>
         <tr valign="top">
             <th scope="row">
-                <label for="from_email">
+                <label for="em_smtp_relay_from_email">
                     <?php _e('From Email Address', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <input name="from_email" type="text" id="from_email" value="<?php echo esc_attr($data->fromEmail); ?>" class="regular-text code">
+                <input name="em_smtp_relay_from_email" type="text" id="em_smtp_relay_from_email" value="<?php echo esc_attr($data->fromEmail); ?>" class="regular-text code">
                 <p class="description">
                     <?php _e('The email address to be used as the \'From\' address if none is provided to the mail function. The domain of From Address should be validated in Emercury SMTP panel, Sending Domains section.', 'em-smtp-relay');?>
                 </p>
@@ -60,12 +60,12 @@
         </tr>
         <tr valign="top">
             <th scope="row">
-                <label for="from_name">
+                <label for="em_smtp_relay_from_name">
                     <?php _e('From Name', 'em-smtp-relay');?>
                 </label>
             </th>
             <td>
-                <input name="from_name" type="text" id="from_name" value="<?php echo esc_attr($data->fromName); ?>" class="regular-text code">
+                <input name="em_smtp_relay_from_name" type="text" id="em_smtp_relay_from_name" value="<?php echo esc_attr($data->fromName); ?>" class="regular-text code">
                 <p class="description">
                     <?php _e('The name to be used as the \'From\' name if none is provided to the mail function.', 'em-smtp-relay');?>
                 </p>
@@ -73,10 +73,10 @@
         </tr>
         <tr valign="top">
             <th scope="row">
-                <label for="force_from_address"><?php _e('Force From Address', 'em-smtp-relay');?></label>
+                <label for="em_smtp_relay_force_from_address"><?php _e('Force From Address', 'em-smtp-relay');?></label>
             </th>
             <td>
-                <input name="force_from_address" type="checkbox" id="force_from_address" <?php checked($data->forceFromAddress, 1); ?> value="1">
+                <input name="em_smtp_relay_force_from_address" type="checkbox" id="em_smtp_relay_force_from_address" <?php checked($data->forceFromAddress, 1); ?> value="1">
                 <p class="description">
                     <?php _e('The "From" address specified in the settings will apply to all outgoing email messages.', 'em-smtp-relay'); ?>
                 </p>

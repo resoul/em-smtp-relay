@@ -44,6 +44,11 @@ class Config implements ConfigInterface
 
     public function saveGeneralSettings(SmtpSettingsDTO $data): bool
     {
+        if (empty($data->smtpPassword)) {
+            $settings = $this->getGeneralSettings();
+            $data->smtpPassword = $settings->smtpPassword;
+        }
+
         return update_option(self::OPTION_GENERAL, $data->toArray());
     }
 

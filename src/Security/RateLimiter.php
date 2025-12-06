@@ -9,7 +9,7 @@ use Emercury\Smtp\Contracts\RateLimiterInterface;
 class RateLimiter implements RateLimiterInterface
 {
     private const OPTION_PREFIX = 'em_smtp_rate_limit_';
-    private const MAX_ATTEMPTS = 10;
+    private const MAX_ATTEMPTS = 20;
     private const TIME_WINDOW = 3600;
 
     public function checkLimit(string $identifier): bool

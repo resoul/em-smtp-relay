@@ -69,6 +69,7 @@ class GeneralTab
         }
 
         $userId = get_current_user_id();
+
         if (!$this->rateLimiter->checkLimit('settings_update_' . $userId)) {
             $this->notifier->addError(
                 __('Too many update attempts. Please wait before trying again.', 'em-smtp-relay')
