@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin;
 
+use Emercury\Smtp\Admin\Tabs\ConfigManagerTab;
 use Emercury\Smtp\Admin\Tabs\GeneralTab;
 use Emercury\Smtp\Admin\Tabs\AdvancedTab;
 use Emercury\Smtp\Admin\Tabs\TestEmailTab;
@@ -13,15 +14,18 @@ class SettingsPage
     private GeneralTab $generalTab;
     private AdvancedTab $advancedTab;
     private TestEmailTab $testEmailTab;
+    private ConfigManagerTab $configManagerTab;
 
     public function __construct(
         GeneralTab $generalTab,
         AdvancedTab $advancedTab,
-        TestEmailTab $testEmailTab
+        TestEmailTab $testEmailTab,
+        ConfigManagerTab $configManagerTab
     ) {
         $this->generalTab = $generalTab;
         $this->advancedTab = $advancedTab;
         $this->testEmailTab = $testEmailTab;
+        $this->configManagerTab = $configManagerTab;
     }
 
     public function registerMenu(): void
@@ -77,6 +81,7 @@ class SettingsPage
             'general' => __('Settings', 'em-smtp-relay'),
             'test-email' => __('Test Email', 'em-smtp-relay'),
             'advanced' => __('Advanced', 'em-smtp-relay'),
+            'config-manager' => __('Import/Export', 'em-smtp-relay'),
         ];
 
         $currentTab = $this->getCurrentTab();
@@ -115,6 +120,9 @@ class SettingsPage
                 break;
             case 'advanced':
                 $this->advancedTab->render();
+                break;
+            case 'config-manager':
+                $this->configManagerTab->render();
                 break;
             default:
                 $this->generalTab->render();

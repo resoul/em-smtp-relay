@@ -84,7 +84,6 @@ class EmailLogger implements EmailLoggerInterface
 
         $logs[] = $logEntry;
 
-        // Ограничить количество логов
         if (count($logs) > self::MAX_LOGS) {
             $logs = array_slice($logs, -self::MAX_LOGS);
         }

@@ -25,7 +25,8 @@ class SmtpSettingsDTO
         string $smtpEncryption = 'tls',
         string $fromEmail = '',
         string $fromName = '',
-        bool $forceFromAddress = false
+        bool $forceFromAddress = false,
+        int $smtpPort = 0
     ) {
         $this->smtpUsername     = $smtpUsername;
         $this->smtpPassword     = $smtpPassword;
@@ -33,6 +34,7 @@ class SmtpSettingsDTO
         $this->fromEmail        = $fromEmail;
         $this->fromName         = $fromName;
         $this->forceFromAddress = $forceFromAddress;
+        $this->smtpPort         = $smtpPort > 0 ? $smtpPort : ($smtpEncryption === 'ssl' ? 465 : 587);
     }
 
     public static function fromArray(array $data): self
@@ -43,7 +45,8 @@ class SmtpSettingsDTO
             $data[SettingKeys::ENCRYPTION] ?? 'tls',
             $data[SettingKeys::FROM_EMAIL] ?? '',
             $data[SettingKeys::FROM_NAME] ?? '',
-            (bool) ($data[SettingKeys::FORCE_FROM_ADDRESS] ?? false)
+            (bool) ($data[SettingKeys::FORCE_FROM_ADDRESS] ?? false),
+            (int) ($data[SettingKeys::PORT] ?? 0)
         );
     }
 

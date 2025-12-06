@@ -6,7 +6,6 @@ namespace Emercury\Smtp\Config;
 
 class SettingKeys
 {
-    // General Settings Keys
     public const USERNAME = 'em_smtp_username';
     public const PASSWORD = 'em_smtp_password';
     public const ENCRYPTION = 'em_smtp_encryption';
@@ -17,7 +16,6 @@ class SettingKeys
     public const AUTH = 'em_smtp_auth';
     public const PORT = 'em_smtp_port';
 
-    // Advanced Settings Keys
     public const REPLY_TO_EMAIL = 'em_smtp_reply_to_email';
     public const REPLY_TO_NAME = 'em_smtp_reply_to_name';
     public const FORCE_REPLY_TO = 'em_smtp_force_reply_to';

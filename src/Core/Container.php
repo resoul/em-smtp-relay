@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Core;
 
 use Emercury\Smtp\Admin\DashboardWidget;
+use Emercury\Smtp\Admin\Tabs\ConfigManagerTab;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\EmailLoggerInterface;
 use Emercury\Smtp\Contracts\EmailStatisticsInterface;
@@ -61,11 +62,9 @@ class Container
         $this->singleton(RateLimiterInterface::class, fn() => new RateLimiter());
         $this->singleton(RateLimiter::class, fn() => $this->get(RateLimiterInterface::class));
 
-        // Logger
         $this->singleton(LoggerInterface::class, fn() => new Logger());
         $this->singleton(Logger::class, fn() => $this->get(LoggerInterface::class));
 
-        // Admin Notifier
         $this->singleton(AdminNotifier::class, fn() => new AdminNotifier());
 
         $this->singleton(DashboardWidget::class, fn() => new DashboardWidget(
@@ -80,7 +79,6 @@ class Container
             $this->get(LoggerInterface::class)
         ));
 
-        // Admin Tabs
         $this->singleton(GeneralTab::class, fn() => new GeneralTab(
             $this->get(EncryptionInterface::class),
             $this->get(ValidatorInterface::class),
@@ -104,10 +102,17 @@ class Container
             $this->get(AdminNotifier::class)
         ));
 
+        $this->singleton(ConfigManagerTab::class, fn() => new ConfigManagerTab(
+            $this->get(ConfigInterface::class),
+            $this->get(NonceManagerInterface::class),
+            $this->get(AdminNotifier::class)
+        ));
+
         $this->singleton(SettingsPage::class, fn() => new SettingsPage(
             $this->get(GeneralTab::class),
             $this->get(AdvancedTab::class),
-            $this->get(TestEmailTab::class)
+            $this->get(TestEmailTab::class),
+            $this->get(ConfigManagerTab::class)
         ));
     }
 

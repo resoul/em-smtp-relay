@@ -103,21 +103,17 @@ class Mailer
     ): void {
         [$to, $subject, $message, $headers, $attachments] = $this->parseMailAttributes($atts);
 
-        // Set basic properties
         $phpmailer->Subject = $subject;
         $phpmailer->Body = $message;
         $phpmailer->CharSet = apply_filters('wp_mail_charset', get_bloginfo('charset'));
 
-        // Parse headers
         $parsedHeaders = $this->parseHeaders($headers);
-
-        // Set content type
         $contentType = $parsedHeaders['content_type'] ?? 'text/plain';
+
         if ($contentType === 'text/html') {
             $phpmailer->isHTML(true);
         }
 
-        // Set From
         $fromEmail = $settings->fromEmail;
         $fromName = $settings->fromName;
 
@@ -131,18 +127,12 @@ class Mailer
             false
         );
 
-        // Add recipients
         $this->addRecipients($phpmailer, $to);
-
-        // Add attachments
         $this->addAttachments($phpmailer, $attachments);
-
-        // Handle Reply-To, CC, BCC
         $this->handleReplyTo($phpmailer, $parsedHeaders, $advancedSettings);
         $this->handleCc($phpmailer, $parsedHeaders, $advancedSettings);
         $this->handleBcc($phpmailer, $parsedHeaders, $advancedSettings);
 
-        // Debug mode
         if (isset($parsedHeaders['em-smtp-debug']) && $parsedHeaders['em-smtp-debug'] === 'True') {
             $phpmailer->SMTPDebug = 2;
         }

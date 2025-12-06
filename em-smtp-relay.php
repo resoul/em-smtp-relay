@@ -16,12 +16,10 @@
 
 declare(strict_types=1);
 
-// Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Define constants
 define('EM_SMTP_VERSION', '1.0.0');
 define('EM_SMTP_FILE', __FILE__);
 define('EM_SMTP_PATH', plugin_dir_path(__FILE__));
@@ -49,14 +47,4 @@ add_action('plugins_loaded', function () {
     $container = new Emercury\Smtp\Core\Container();
     $plugin = new Emercury\Smtp\Core\Plugin($container);
     $plugin->init();
-});
-
-// Activation hook
-register_activation_hook(__FILE__, function () {
-    // Future: Add activation logic
-});
-
-// Deactivation hook
-register_deactivation_hook(__FILE__, function () {
-    // Future: Add deactivation logic
 });

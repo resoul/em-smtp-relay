@@ -37,11 +37,9 @@ class Plugin
 
     private function registerHooks(): void
     {
-        // Initialize mailer
         $mailer = $this->container->get(Mailer::class);
         add_filter('pre_wp_mail', [$mailer, 'sendMail'], 10, 2);
 
-        // Admin hooks
         if (is_admin()) {
             $this->registerAdminHooks();
         }
@@ -59,6 +57,11 @@ class Plugin
 
         $dashboardWidget = $this->container->get(DashboardWidget::class);
         $dashboardWidget->register();
+
+        add_action('wp_ajax_em_smtp_delete_attachment', function() {
+            $testEmailTab = $this->container->get(\Emercury\Smtp\Admin\Tabs\TestEmailTab::class);
+            $testEmailTab->deleteTestAttachment();
+        });
     }
 
     private function scheduleCleanup(): void
