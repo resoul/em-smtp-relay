@@ -11,6 +11,7 @@ use Emercury\Smtp\Contracts\EncryptionInterface;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\LoggerInterface;
 use Emercury\Smtp\Config\Config;
+use Emercury\Smtp\Events\EventManager;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use WP_Error;
@@ -21,17 +22,20 @@ class Mailer
     private ConfigInterface $config;
     private LoggerInterface $logger;
     private EmailLoggerInterface $emailLogger;
+    private EventManager $events;
 
     public function __construct(
         EncryptionInterface $encryption,
         ConfigInterface $config,
         EmailLoggerInterface $emailLogger,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EventManager $events
     ) {
         $this->encryption = $encryption;
         $this->config = $config;
         $this->logger = $logger;
         $this->emailLogger = $emailLogger;
+        $this->events = $events;
     }
 
     public function sendMail($return, array $atts)

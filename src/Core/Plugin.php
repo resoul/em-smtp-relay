@@ -6,6 +6,7 @@ namespace Emercury\Smtp\Core;
 
 use Emercury\Smtp\Admin\DashboardWidget;
 use Emercury\Smtp\Admin\SettingsPage;
+use Emercury\Smtp\Admin\StatisticsPage;
 use Emercury\Smtp\Admin\Tabs\TestEmailTab;
 use Emercury\Smtp\Contracts\EmailLoggerInterface;
 
@@ -58,6 +59,9 @@ class Plugin
 
         $dashboardWidget = $this->container->get(DashboardWidget::class);
         $dashboardWidget->register();
+
+        $statisticsPage = $this->container->get(StatisticsPage::class);
+        $statisticsPage->register();
 
         add_action('wp_ajax_em_smtp_delete_attachment', function() {
             $testEmailTab = $this->container->get(TestEmailTab::class);

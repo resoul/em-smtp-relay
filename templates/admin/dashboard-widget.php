@@ -42,13 +42,17 @@
 
         <!-- Recent Logs -->
         <?php if (!empty($recentLogs)): ?>
+        <?php var_dump($recentLogs); ?>
             <div class="em-smtp-recent-logs">
                 <h4><?php esc_html_e('Recent Emails', 'em-smtp-relay'); ?></h4>
                 <?php foreach ($recentLogs as $log): ?>
                     <div class="em-smtp-log-item">
                         <span class="em-smtp-log-status <?php echo esc_attr($log['status']); ?>"></span>
                         <span class="em-smtp-log-subject">
-                            <?php echo esc_html(wp_trim_words($log['subject'], 6, '...')); ?>
+                            <?php
+                            $subject = isset($log['subject']) ? $log['subject'] : '';
+                            echo esc_html(wp_trim_words($subject, 6, '...'));
+                            ?>
                         </span>
                         <br>
                         <span class="em-smtp-log-time">
@@ -56,8 +60,8 @@
                             echo esc_html(
                                 sprintf(
                                     __('To: %s • %s', 'em-smtp-relay'),
-                                    wp_trim_words($log['to'], 2, '...'),
-                                    human_time_diff(strtotime($log['timestamp']), current_time('timestamp'))
+                                    wp_trim_words($log['recipient'], 2, '...'),
+                                    human_time_diff(strtotime($log['created_at']), current_time('timestamp'))
                                 ) . ' ' . __('ago', 'em-smtp-relay')
                             );
                             ?>

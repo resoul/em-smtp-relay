@@ -5,68 +5,107 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Logging;
 
 use Emercury\Smtp\Contracts\EmailLoggerInterface;
+use Emercury\Smtp\Database\DatabaseManager;
+use Emercury\Smtp\Events\EventManager;
 
 class EmailLogger implements EmailLoggerInterface
 {
-    private const OPTION_KEY = 'em_smtp_email_logs';
-    private const MAX_LOGS = 500;
+    private DatabaseManager $db;
+    private EventManager $events;
+
+    public function __construct(DatabaseManager $db, EventManager $events)
+    {
+        $this->db = $db;
+        $this->events = $events;
+    }
 
     public function logSent(array $emailData): void
     {
-        $this->addLog([
+        global $wpdb;
+
+        $table = $this->db->getLogsTableName();
+
+        $wpdb->insert($table, [
             'status' => 'sent',
-            'to' => $this->sanitizeRecipients($emailData['to'] ?? ''),
+            'recipient' => $this->sanitizeRecipients($emailData['to'] ?? ''),
             'subject' => sanitize_text_field($emailData['subject'] ?? ''),
-            'timestamp' => current_time('mysql'),
-            'date' => current_time('Y-m-d'),
+            'metadata' => wp_json_encode($emailData),
+            'created_at' => current_time('mysql'),
         ]);
+
+        $this->updateStatistics('sent');
+        $this->events->dispatch('email_sent', $emailData);
     }
 
     public function logFailed(array $emailData, string $error): void
     {
-        $this->addLog([
+        global $wpdb;
+
+        $table = $this->db->getLogsTableName();
+
+        $wpdb->insert($table, [
             'status' => 'failed',
-            'to' => $this->sanitizeRecipients($emailData['to'] ?? ''),
+            'recipient' => $this->sanitizeRecipients($emailData['to'] ?? ''),
             'subject' => sanitize_text_field($emailData['subject'] ?? ''),
-            'error' => sanitize_text_field($error),
-            'timestamp' => current_time('mysql'),
-            'date' => current_time('Y-m-d'),
+            'error_message' => sanitize_text_field($error),
+            'metadata' => wp_json_encode($emailData),
+            'created_at' => current_time('mysql'),
         ]);
+
+        $this->updateStatistics('failed');
+        $this->events->dispatch('email_failed', $emailData, $error);
     }
 
     public function getRecentLogs(int $limit = 50, ?string $status = null): array
     {
-        $logs = get_option(self::OPTION_KEY, []);
+        global $wpdb;
+
+        $table = $this->db->getLogsTableName();
+
+        $sql = "SELECT * FROM $table";
 
         if ($status !== null) {
-            $logs = array_filter($logs, fn($log) => $log['status'] === $status);
+            $sql .= $wpdb->prepare(" WHERE status = %s", $status);
         }
 
-        return array_slice(array_reverse($logs), 0, $limit);
+        $sql .= " ORDER BY created_at DESC LIMIT %d";
+
+        return $wpdb->get_results($wpdb->prepare($sql, $limit), ARRAY_A);
     }
 
     public function clearOldLogs(int $daysToKeep = 30): int
     {
-        $logs = get_option(self::OPTION_KEY, []);
-        $cutoffDate = date('Y-m-d', strtotime("-{$daysToKeep} days"));
+        global $wpdb;
 
-        $originalCount = count($logs);
-        $logs = array_filter($logs, fn($log) => $log['date'] >= $cutoffDate);
+        $table = $this->db->getLogsTableName();
+        $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$daysToKeep} days"));
 
-        update_option(self::OPTION_KEY, array_values($logs));
+        $deleted = $wpdb->query($wpdb->prepare(
+            "DELETE FROM $table WHERE created_at < %s",
+            $cutoffDate
+        ));
 
-        return $originalCount - count($logs);
+        return $deleted ?: 0;
     }
 
     public function getStatistics(string $period = 'today'): array
     {
-        $logs = get_option(self::OPTION_KEY, []);
+        global $wpdb;
+
+        $table = $this->db->getLogsTableName();
         $dateFilter = $this->getDateFilter($period);
 
-        $filteredLogs = array_filter($logs, fn($log) => $log['date'] >= $dateFilter);
+        $result = $wpdb->get_row($wpdb->prepare("
+            SELECT 
+                COUNT(CASE WHEN status = 'sent' THEN 1 END) as sent,
+                COUNT(CASE WHEN status = 'failed' THEN 1 END) as failed,
+                COUNT(*) as total
+            FROM $table
+            WHERE created_at >= %s
+        ", $dateFilter), ARRAY_A);
 
-        $sent = count(array_filter($filteredLogs, fn($log) => $log['status'] === 'sent'));
-        $failed = count(array_filter($filteredLogs, fn($log) => $log['status'] === 'failed'));
+        $sent = (int) ($result['sent'] ?? 0);
+        $failed = (int) ($result['failed'] ?? 0);
         $total = $sent + $failed;
 
         return [
@@ -78,17 +117,70 @@ class EmailLogger implements EmailLoggerInterface
         ];
     }
 
-    private function addLog(array $logEntry): void
+    /**
+     * Получить статистику по часам для графиков
+     */
+    public function getHourlyStatistics(int $days = 7): array
     {
-        $logs = get_option(self::OPTION_KEY, []);
+        global $wpdb;
 
-        $logs[] = $logEntry;
+        $table = $this->db->getStatsTableName();
+        $startDate = date('Y-m-d', strtotime("-{$days} days"));
 
-        if (count($logs) > self::MAX_LOGS) {
-            $logs = array_slice($logs, -self::MAX_LOGS);
-        }
+        $results = $wpdb->get_results($wpdb->prepare("
+            SELECT 
+                date,
+                hour,
+                sent_count,
+                failed_count
+            FROM $table
+            WHERE date >= %s
+            ORDER BY date ASC, hour ASC
+        ", $startDate), ARRAY_A);
 
-        update_option(self::OPTION_KEY, $logs);
+        return $results ?: [];
+    }
+
+    /**
+     * Получить статистику по дням для графиков
+     */
+    public function getDailyStatistics(int $days = 30): array
+    {
+        global $wpdb;
+
+        $table = $this->db->getStatsTableName();
+        $startDate = date('Y-m-d', strtotime("-{$days} days"));
+
+        $results = $wpdb->get_results($wpdb->prepare("
+            SELECT 
+                date,
+                SUM(sent_count) as sent,
+                SUM(failed_count) as failed,
+                SUM(sent_count + failed_count) as total
+            FROM $table
+            WHERE date >= %s
+            GROUP BY date
+            ORDER BY date ASC
+        ", $startDate), ARRAY_A);
+
+        return $results ?: [];
+    }
+
+    private function updateStatistics(string $status): void
+    {
+        global $wpdb;
+
+        $table = $this->db->getStatsTableName();
+        $date = current_time('Y-m-d');
+        $hour = (int) current_time('H');
+
+        $field = $status === 'sent' ? 'sent_count' : 'failed_count';
+
+        $wpdb->query($wpdb->prepare("
+            INSERT INTO $table (date, hour, {$field})
+            VALUES (%s, %d, 1)
+            ON DUPLICATE KEY UPDATE {$field} = {$field} + 1
+        ", $date, $hour));
     }
 
     private function sanitizeRecipients($recipients): string
@@ -96,7 +188,6 @@ class EmailLogger implements EmailLoggerInterface
         if (is_array($recipients)) {
             $recipients = implode(', ', $recipients);
         }
-
         return sanitize_text_field($recipients);
     }
 
@@ -104,14 +195,14 @@ class EmailLogger implements EmailLoggerInterface
     {
         switch ($period) {
             case 'today':
-                return current_time('Y-m-d');
+                return current_time('Y-m-d 00:00:00');
             case 'week':
-                return date('Y-m-d', strtotime('-7 days'));
+                return date('Y-m-d 00:00:00', strtotime('-7 days'));
             case 'month':
-                return date('Y-m-d', strtotime('-30 days'));
+                return date('Y-m-d 00:00:00', strtotime('-30 days'));
             case 'all':
             default:
-                return '1970-01-01';
+                return '1970-01-01 00:00:00';
         }
     }
 }

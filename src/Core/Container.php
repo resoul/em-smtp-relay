@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Core;
 
 use Emercury\Smtp\Admin\DashboardWidget;
+use Emercury\Smtp\Admin\StatisticsPage;
 use Emercury\Smtp\Admin\Tabs\ConfigManagerTab;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\EmailLoggerInterface;
@@ -15,6 +16,8 @@ use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\RateLimiterInterface;
 use Emercury\Smtp\Contracts\LoggerInterface;
 use Emercury\Smtp\Admin\AdminNotifier;
+use Emercury\Smtp\Database\DatabaseManager;
+use Emercury\Smtp\Events\EventManager;
 use Emercury\Smtp\Logging\EmailLogger;
 use Emercury\Smtp\Security\Encryption;
 use Emercury\Smtp\Security\Validator;
@@ -25,6 +28,7 @@ use Emercury\Smtp\Admin\SettingsPage;
 use Emercury\Smtp\Admin\Tabs\GeneralTab;
 use Emercury\Smtp\Admin\Tabs\AdvancedTab;
 use Emercury\Smtp\Admin\Tabs\TestEmailTab;
+use Emercury\Smtp\Statistics\AdvancedStatistics;
 use Emercury\Smtp\Statistics\EmailStatistics;
 
 class Container
@@ -39,16 +43,26 @@ class Container
 
     private function registerServices(): void
     {
+        $this->singleton(DatabaseManager::class, fn() => new DatabaseManager());
+        $this->singleton(EventManager::class, fn() => EventManager::getInstance());
+
         $this->singleton(ConfigInterface::class, fn() => new Config());
         $this->singleton(Config::class, fn() => $this->get(ConfigInterface::class));
 
-        $this->singleton(EmailLoggerInterface::class, fn() => new EmailLogger());
+        $this->singleton(EmailLoggerInterface::class, fn() => new EmailLogger(
+            $this->get(DatabaseManager::class),
+            $this->get(EventManager::class)
+        ));
         $this->singleton(EmailLogger::class, fn() => $this->get(EmailLoggerInterface::class));
 
         $this->singleton(EmailStatisticsInterface::class, fn() => new EmailStatistics(
             $this->get(EmailLoggerInterface::class)
         ));
         $this->singleton(EmailStatistics::class, fn() => $this->get(EmailStatisticsInterface::class));
+
+        $this->singleton(AdvancedStatistics::class, fn() => new AdvancedStatistics(
+            $this->get(EmailLoggerInterface::class)
+        ));
 
         $this->singleton(EncryptionInterface::class, fn() => new Encryption());
         $this->singleton(Encryption::class, fn() => $this->get(EncryptionInterface::class));
@@ -69,6 +83,10 @@ class Container
 
         $this->singleton(RequestHandler::class, fn() => new RequestHandler());
 
+        $this->singleton(StatisticsPage::class, fn() => new StatisticsPage(
+            $this->get(AdvancedStatistics::class)
+        ));
+
         $this->singleton(DashboardWidget::class, fn() => new DashboardWidget(
             $this->get(EmailStatisticsInterface::class),
             $this->get(ConfigInterface::class)
@@ -78,7 +96,8 @@ class Container
             $this->get(EncryptionInterface::class),
             $this->get(ConfigInterface::class),
             $this->get(EmailLoggerInterface::class),
-            $this->get(LoggerInterface::class)
+            $this->get(LoggerInterface::class),
+            $this->get(EventManager::class)
         ));
 
         $this->singleton(GeneralTab::class, fn() => new GeneralTab(
