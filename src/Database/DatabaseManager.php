@@ -30,8 +30,6 @@ class DatabaseManager
         global $wpdb;
 
         $charset_collate = $wpdb->get_charset_collate();
-
-        // Таблица для логов
         $table_logs = $wpdb->prefix . self::TABLE_LOGS;
         $sql_logs = "CREATE TABLE IF NOT EXISTS $table_logs (
             id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -47,7 +45,6 @@ class DatabaseManager
             KEY status_date (status, created_at)
         ) $charset_collate;";
 
-        // Таблица для агрегированной статистики
         $table_stats = $wpdb->prefix . self::TABLE_STATS;
         $sql_stats = "CREATE TABLE IF NOT EXISTS $table_stats (
             id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,

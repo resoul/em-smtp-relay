@@ -87,6 +87,13 @@ class ConfigTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertArrayHasKey(Config::OPTION_GENERAL, $this->options);
+
+        $dto->smtpPassword = '';
+        $this->config->saveGeneralSettings($dto);
+
+        $settings = $this->config->getGeneralSettings();
+
+        $this->assertNotEquals('', $settings->smtpPassword);
     }
 
     public function testGetAdvancedSettingsReturnsDefaults(): void
@@ -115,5 +122,8 @@ class ConfigTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertArrayHasKey(Config::OPTION_ADVANCED, $this->options);
+
+        $settings = $this->config->getAdvancedSettings();
+        $this->assertEquals('BCC Name', $settings->bccName);
     }
 }

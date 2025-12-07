@@ -27,16 +27,25 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
+    /**
+     * Create a mock object
+     */
     protected function mock(string $class): \Mockery\MockInterface
     {
         return \Mockery::mock($class);
     }
 
+    /**
+     * Create a partial mock
+     */
     protected function partialMock(string $class): \Mockery\MockInterface
     {
         return \Mockery::mock($class)->makePartial();
     }
 
+    /**
+     * Create a spy object
+     */
     protected function spy(string $class): \Mockery\MockInterface
     {
         return \Mockery::spy($class);

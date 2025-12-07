@@ -23,9 +23,7 @@
     }
   },
   "scripts": {
-    "test": "phpunit",
-    "test:unit": "phpunit --testsuite 'Unit Tests'",
-    "test:integration": "phpunit --testsuite 'Integration Tests'",
-    "test:coverage": "phpunit --coverage-html tests/coverage"
+    "test": "phpunit tests",
+    "test-coverage": "XDEBUG_MODE=coverage phpunit tests --coverage-text=tmp/coverage.txt --coverage-html tmp/coverage-report"
   }
 }

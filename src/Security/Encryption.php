@@ -27,10 +27,6 @@ class Encryption implements EncryptionInterface
             $iv
         );
 
-        if ($encrypted === false) {
-            throw new \RuntimeException('Encryption failed');
-        }
-
         return base64_encode($encrypted);
     }
 

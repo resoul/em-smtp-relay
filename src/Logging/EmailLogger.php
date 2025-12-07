@@ -117,9 +117,6 @@ class EmailLogger implements EmailLoggerInterface
         ];
     }
 
-    /**
-     * Получить статистику по часам для графиков
-     */
     public function getHourlyStatistics(int $days = 7): array
     {
         global $wpdb;
@@ -141,9 +138,6 @@ class EmailLogger implements EmailLoggerInterface
         return $results ?: [];
     }
 
-    /**
-     * Получить статистику по дням для графиков
-     */
     public function getDailyStatistics(int $days = 30): array
     {
         global $wpdb;
@@ -164,6 +158,11 @@ class EmailLogger implements EmailLoggerInterface
         ", $startDate), ARRAY_A);
 
         return $results ?: [];
+    }
+
+    public function getLogsTableName(): string
+    {
+        return $this->db->getLogsTableName();
     }
 
     private function updateStatistics(string $status): void

@@ -3,19 +3,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
         bootstrap="tests/bootstrap.php"
-        colors="true"
-        convertErrorsToExceptions="true"
-        convertNoticesToExceptions="true"
-        convertWarningsToExceptions="true"
-        stopOnFailure="false"
-        verbose="true">
+        colors="true">
 
     <testsuites>
-        <testsuite name="Unit Tests">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration Tests">
-            <directory suffix="Test.php">./tests/Integration</directory>
+        <testsuite name="Project Test Suite">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 
@@ -26,14 +18,5 @@
         <exclude>
             <directory>./src/Contracts</directory>
         </exclude>
-        <report>
-            <html outputDirectory="tests/coverage"/>
-            <text outputFile="php://stdout" showUncoveredFiles="false"/>
-        </report>
     </coverage>
-
-    <php>
-        <env name="WP_TESTS_DIR" value="/tmp/wordpress-tests-lib"/>
-        <env name="WP_CORE_DIR" value="/tmp/wordpress/"/>
-    </php>
 </phpunit>

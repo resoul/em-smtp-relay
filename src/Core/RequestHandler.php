@@ -9,7 +9,7 @@ class RequestHandler
     private array $data;
     private array $files;
 
-    public function __construct(array $data = null, array $files = null)
+    public function __construct(?array $data = null, ?array $files = null)
     {
         $this->data = $data ?? $_POST;
         $this->files = $files ?? $_FILES;
