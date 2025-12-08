@@ -34,11 +34,17 @@ class EmailStatistics implements EmailStatisticsInterface
         return $stats['failure_rate'];
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getRecentLogs(int $limit = 10): array
     {
         return $this->emailLogger->getRecentLogs($limit);
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getSummary(): array
     {
         return [

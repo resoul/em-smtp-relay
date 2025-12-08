@@ -35,7 +35,7 @@ class StatisticsPage
         );
     }
 
-    public function enqueueAssets($hook): void
+    public function enqueueAssets(string $hook): void
     {
         if ($hook !== 'settings_page_em-smtp-statistics') {
             return;
@@ -58,8 +58,8 @@ class StatisticsPage
         );
 
         wp_localize_script('em-smtp-statistics', 'emSmtpStats', [
-            'dailyData' => $this->statistics->getDailyChartData(30),
-            'hourlyData' => $this->statistics->getChartData(7),
+            'dailyData' => $this->statistics->getDailyChartData(),
+            'hourlyData' => $this->statistics->getChartData(),
         ]);
 
         wp_enqueue_style(

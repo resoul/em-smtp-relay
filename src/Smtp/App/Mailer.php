@@ -32,7 +32,11 @@ class Mailer
         $this->events = $events;
     }
 
-    public function sendMail($return, array $atts)
+    /**
+     * @param array<mixed> $atts
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter
+     */
+    public function sendMail(?bool $return, array $atts): bool
     {
         global $phpmailer;
 
@@ -59,10 +63,7 @@ class Mailer
 
     private function validateSettings(SmtpSettingsDTO $settings): bool
     {
-        if (empty($settings->smtpUsername) ||
-            empty($settings->smtpPassword) ||
-            empty($settings->fromEmail)) {
-
+        if (empty($settings->smtpUsername) || empty($settings->smtpPassword) || empty($settings->fromEmail)) {
             do_action('wp_mail_failed', new WP_Error(
                 'wp_mail_failed',
                 'SMTP settings not configured'
@@ -78,19 +79,22 @@ class Mailer
     {
         $phpmailer->isSMTP();
         $phpmailer->SMTPAuth = true;
-        $phpmailer->Host = $settings->smtpHost;
-        $phpmailer->Username = $settings->smtpUsername;
+        $phpmailer->Host = $settings->smtpHost; // phpcs:ignore
+        $phpmailer->Username = $settings->smtpUsername; // phpcs:ignore
         $password = $this->encryption->decrypt($settings->smtpPassword);
 
         if (empty($password)) {
             throw new \RuntimeException('Failed to decrypt SMTP password');
         }
 
-        $phpmailer->Password = $password;
+        $phpmailer->Password = $password; // phpcs:ignore
         $phpmailer->SMTPSecure = $settings->smtpEncryption;
-        $phpmailer->Port = $this->config->getSmtpPort($settings->smtpEncryption);
+        $phpmailer->Port = $this->config->getSmtpPort($settings->smtpEncryption); // phpcs:ignore
     }
 
+    /**
+     * @param array<mixed> $atts
+     */
     private function prepareEmail(
         PHPMailer $phpmailer,
         array $atts,
@@ -99,9 +103,9 @@ class Mailer
     ): void {
         [$to, $subject, $message, $headers, $attachments] = $this->parseMailAttributes($atts);
 
-        $phpmailer->Subject = $subject;
-        $phpmailer->Body = $message;
-        $phpmailer->CharSet = apply_filters('wp_mail_charset', get_bloginfo('charset'));
+        $phpmailer->Subject = $subject; // phpcs:ignore
+        $phpmailer->Body = $message; // phpcs:ignore
+        $phpmailer->CharSet = apply_filters('wp_mail_charset', get_bloginfo('charset')); // phpcs:ignore
 
         $parsedHeaders = $this->parseHeaders($headers);
         $contentType = $parsedHeaders['content_type'] ?? 'text/plain';
@@ -136,26 +140,31 @@ class Mailer
         do_action_ref_array('phpmailer_init', [&$phpmailer]);
     }
 
+    /**
+     * @param array<mixed> $atts
+     */
     private function send(PHPMailer $phpmailer, array $atts): bool
     {
         try {
             $result = $phpmailer->send();
 
-            if ($result) {
-                $this->emailLogger->logSent([
-                    'to' => $atts['to'] ?? '',
-                    'subject' => $atts['subject'] ?? '',
-                ]);
+            $to = '';
+            $subject = sanitize_text_field($atts['subject']);
 
+            if (is_array($atts['to'])) {
+                $to = sanitize_text_field(implode(', ', $atts['to']));
+            } else {
+                $to = sanitize_text_field($atts['to']);
+            }
+
+            if ($result) {
+                $this->emailLogger->logSent($to, $subject);
                 do_action('wp_mail_succeeded', $atts);
             }
 
             return $result;
         } catch (PHPMailerException $e) {
-            $this->emailLogger->logFailed([
-                'to' => $atts['to'] ?? '',
-                'subject' => $atts['subject'] ?? '',
-            ], $e->getMessage());
+            $this->emailLogger->logFailed($to, $subject, sanitize_text_field($e->getMessage()));
 
             do_action('wp_mail_failed', new WP_Error(
                 'wp_mail_failed',
@@ -167,6 +176,9 @@ class Mailer
         }
     }
 
+    /**
+     * @param array<mixed> $headers
+     */
     private function parseHeaders(array $headers): array
     {
         $parsed = [];
@@ -183,11 +195,11 @@ class Mailer
         return $parsed;
     }
 
-    private function handleReplyTo(
-        PHPMailer $phpmailer,
-        array $headers,
-        AdvancedSettingsDTO $advancedSettings
-    ): void {
+    /**
+     * @param array<mixed> $headers
+     */
+    private function handleReplyTo(PHPMailer $phpmailer, array $headers, AdvancedSettingsDTO $advancedSettings): void
+    {
         $replyTo = $advancedSettings->replyToEmail;
         $replyToName = $advancedSettings->replyToName;
 
@@ -200,11 +212,11 @@ class Mailer
         }
     }
 
-    private function handleCc(
-        PHPMailer $phpmailer,
-        array $headers,
-        AdvancedSettingsDTO $advancedSettings
-    ): void {
+    /**
+     * @param array<mixed> $headers
+     */
+    private function handleCc(PHPMailer $phpmailer, array $headers, AdvancedSettingsDTO $advancedSettings): void
+    {
         $ccList = [];
 
         if (!empty($advancedSettings->forceCc)) {
@@ -218,17 +230,18 @@ class Mailer
 
         foreach ($ccList as $cc) {
             [$name, $email] = $this->parseEmailHeader([$cc]);
+
             if (!empty($email) && is_email($email)) {
                 $phpmailer->addCc($email, $name);
             }
         }
     }
 
-    private function handleBcc(
-        PHPMailer $phpmailer,
-        array $headers,
-        AdvancedSettingsDTO $advancedSettings
-    ): void {
+    /**
+     * @param array<mixed> $headers
+     */
+    private function handleBcc(PHPMailer $phpmailer, array $headers, AdvancedSettingsDTO $advancedSettings): void
+    {
         $bccList = [];
 
         if (!empty($advancedSettings->forceBcc)) {
@@ -242,26 +255,30 @@ class Mailer
 
         foreach ($bccList as $bcc) {
             [$name, $email] = $this->parseEmailHeader([$bcc]);
+
             if (!empty($email) && is_email($email)) {
                 $phpmailer->addBcc($email, $name);
             }
         }
     }
 
-    private function addRecipients(PHPMailer $phpmailer, $to): void
+    /**
+     * @param array<mixed> $to
+     */
+    private function addRecipients(PHPMailer $phpmailer, array $to): void
     {
-        if (!is_array($to)) {
-            $to = [$to];
-        }
-
         foreach ($to as $recipient) {
             [$name, $email] = $this->parseEmailHeader([$recipient]);
+
             if (!empty($email) && is_email($email)) {
                 $phpmailer->addAddress($email, $name);
             }
         }
     }
 
+    /**
+     * @param array<mixed> $attachments
+     */
     private function addAttachments(PHPMailer $phpmailer, array $attachments): void
     {
         foreach ($attachments as $filename => $attachment) {
@@ -274,22 +291,27 @@ class Mailer
         }
     }
 
+    /**
+     * @param array<mixed> $atts
+     */
     private function parseMailAttributes(array $atts): array
     {
         $to = $atts['to'] ?? [];
+
         if (!is_array($to)) {
             $to = explode(',', $to);
         }
 
         $subject = $atts['subject'] ?? '';
         $message = $atts['message'] ?? '';
-
         $headers = $atts['headers'] ?? [];
+
         if (!is_array($headers)) {
             $headers = explode("\n", str_replace("\r\n", "\n", $headers));
         }
 
         $attachments = $atts['attachments'] ?? [];
+
         if (!is_array($attachments)) {
             $attachments = explode("\n", str_replace("\r\n", "\n", $attachments));
         }
@@ -309,6 +331,9 @@ class Mailer
         return empty($name) ? $email : "$name <$email>";
     }
 
+    /**
+     * @param array<mixed> $content
+     */
     private function parseEmailHeader(array $content): array
     {
         $name = '';
@@ -334,7 +359,7 @@ class Mailer
         return [$name, $email];
     }
 
-    private function initializeMailer(&$phpmailer): void
+    private function initializeMailer(?PHPMailer $phpmailer = null): void
     {
         if (!($phpmailer instanceof PHPMailer)) {
             require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
@@ -351,7 +376,7 @@ class Mailer
         $phpmailer->clearAttachments();
         $phpmailer->clearCustomHeaders();
         $phpmailer->clearReplyTos();
-        $phpmailer->Body = '';
-        $phpmailer->AltBody = '';
+        $phpmailer->Body = ''; // phpcs:ignore
+        $phpmailer->AltBody = ''; // phpcs:ignore
     }
 }

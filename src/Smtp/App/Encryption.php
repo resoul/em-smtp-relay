@@ -40,6 +40,7 @@ class Encryption implements EncryptionInterface
         $iv = substr(wp_salt('secure_auth'), 0, 16);
 
         $decoded = base64_decode($data, true);
+
         if ($decoded === false) {
             return '';
         }

@@ -6,7 +6,14 @@ namespace Emercury\Smtp\App;
 
 class RequestHandler
 {
+    /**
+     * @var array<mixed> $data
+     */
     private array $data;
+
+    /**
+     * @var array<mixed> $files
+     */
     private array $files;
 
     public function __construct(?array $data = null, ?array $files = null)
@@ -25,6 +32,7 @@ class RequestHandler
         if (!isset($this->data[$key])) {
             return $default;
         }
+
         return sanitize_text_field($this->data[$key]);
     }
 
@@ -33,6 +41,7 @@ class RequestHandler
         if (!isset($this->data[$key])) {
             return $default;
         }
+
         return sanitize_email($this->data[$key]);
     }
 
@@ -41,6 +50,7 @@ class RequestHandler
         if (!isset($this->data[$key])) {
             return $default;
         }
+
         return (int) $this->data[$key];
     }
 
@@ -49,14 +59,19 @@ class RequestHandler
         if (!isset($this->data[$key])) {
             return $default;
         }
+
         return filter_var($this->data[$key], FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+     * @param array<mixed> $default
+     */
     public function getArray(string $key, array $default = []): array
     {
         if (!isset($this->data[$key]) || !is_array($this->data[$key])) {
             return $default;
         }
+
         return $this->data[$key];
     }
 
@@ -65,6 +80,7 @@ class RequestHandler
         if (!isset($this->data[$key])) {
             return $default;
         }
+
         return wp_kses_post($this->data[$key]);
     }
 
@@ -73,6 +89,7 @@ class RequestHandler
         if (!isset($this->data[$key])) {
             return $default;
         }
+
         return esc_url_raw($this->data[$key]);
     }
 
@@ -81,6 +98,7 @@ class RequestHandler
         if (!isset($this->files[$key]) || $this->files[$key]['error'] !== UPLOAD_ERR_OK) {
             return null;
         }
+
         return $this->files[$key];
     }
 

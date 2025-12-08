@@ -123,7 +123,7 @@ class AdvancedStatistics
 
     private function calculatePercentageChange(float $oldValue, float $newValue): float
     {
-        if ($oldValue == 0) {
+        if ($oldValue === 0.00) {
             return $newValue > 0 ? 100.0 : 0.0;
         }
 

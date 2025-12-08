@@ -10,7 +10,7 @@ use Emercury\Smtp\Contracts\ValidatorInterface;
 
 class Validator implements ValidatorInterface
 {
-    private $localization;
+    private Localization $localization;
 
     public function __construct(Localization $localization)
     {
@@ -22,6 +22,9 @@ class Validator implements ValidatorInterface
         return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function validateSmtpSettings(SmtpSettingsDTO $data): array
     {
         $errors = [];
@@ -41,6 +44,9 @@ class Validator implements ValidatorInterface
         return $errors;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function validateAdvancedSettings(AdvancedSettingsDTO $data): array
     {
         $errors = [];

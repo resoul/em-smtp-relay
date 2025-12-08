@@ -29,7 +29,7 @@ class Plugin
     private function loadTextDomain(): void
     {
         $l10n = $this->container->get(Localization::class);
-        add_action('init', function () use ($l10n) {
+        add_action('init', static function () use ($l10n) {
             $l10n->load(dirname(EM_SMTP_BASENAME) . '/languages');
         });
     }
@@ -51,7 +51,7 @@ class Plugin
         add_action('admin_menu', [$settingsPage, 'registerMenu']);
         add_filter('plugin_action_links_' . EM_SMTP_BASENAME, [
             $settingsPage,
-            'addActionLinks'
+            'addActionLinks',
         ]);
 
         $dashboardWidget = $this->container->get(DashboardWidget::class);
@@ -60,11 +60,10 @@ class Plugin
         $statisticsPage = $this->container->get(StatisticsPage::class);
         $statisticsPage->register();
 
-        add_action('wp_ajax_em_smtp_delete_attachment', function() {
+        add_action('wp_ajax_em_smtp_delete_attachment', function () {
             $testEmailTab = $this->container->get(TestEmailTab::class);
             $testEmailTab->deleteTestAttachment();
         });
-
     }
 
     private function scheduleCleanup(): void
@@ -73,7 +72,7 @@ class Plugin
             wp_schedule_event(time(), 'daily', 'em_smtp_cleanup_logs');
         }
 
-        add_action('em_smtp_cleanup_logs', function() {
+        add_action('em_smtp_cleanup_logs', function () {
             $emailLogger = $this->container->get(EmailLoggerInterface::class);
             $emailLogger->clearOldLogs(30);
         });

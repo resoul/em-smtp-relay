@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
+use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\App\Localization;
+use Emercury\Smtp\App\RequestHandler;
 use Emercury\Smtp\Config\DTO\SmtpSettingsDTO;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\EncryptionInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\RateLimiterInterface;
 use Emercury\Smtp\Contracts\ValidatorInterface;
-use Emercury\Smtp\Admin\AdminNotifier;
-use Emercury\Smtp\App\RequestHandler;
 
 class GeneralTab
 {
@@ -33,7 +33,7 @@ class GeneralTab
         RateLimiterInterface $rateLimiter,
         AdminNotifier $notifier,
         Localization $localization,
-        RequestHandler $request
+        RequestHandler $request,
     ) {
         $this->encryption = $encryption;
         $this->validator = $validator;

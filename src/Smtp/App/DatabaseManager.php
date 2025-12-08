@@ -29,24 +29,23 @@ class DatabaseManager
     {
         global $wpdb;
 
-        $charset_collate = $wpdb->get_charset_collate();
-        $table_logs = $wpdb->prefix . self::TABLE_LOGS;
-        $sql_logs = "CREATE TABLE IF NOT EXISTS $table_logs (
+        $charsetCollate = $wpdb->get_charset_collate();
+        $tableLogs = $wpdb->prefix . self::TABLE_LOGS;
+        $sqlLogs = "CREATE TABLE IF NOT EXISTS $tableLogs (
             id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             status varchar(20) NOT NULL,
             recipient varchar(255) NOT NULL,
             subject text NOT NULL,
             error_message text NULL,
-            metadata longtext NULL,
             created_at datetime NOT NULL,
             PRIMARY KEY (id),
             KEY status (status),
             KEY created_at (created_at),
             KEY status_date (status, created_at)
-        ) $charset_collate;";
+        ) $charsetCollate;";
 
-        $table_stats = $wpdb->prefix . self::TABLE_STATS;
-        $sql_stats = "CREATE TABLE IF NOT EXISTS $table_stats (
+        $tableStats = $wpdb->prefix . self::TABLE_STATS;
+        $sqlStats = "CREATE TABLE IF NOT EXISTS $tableStats (
             id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             date date NOT NULL,
             hour tinyint(2) NOT NULL DEFAULT 0,
@@ -54,14 +53,14 @@ class DatabaseManager
             failed_count int(11) NOT NULL DEFAULT 0,
             PRIMARY KEY (id),
             UNIQUE KEY date_hour (date, hour)
-        ) $charset_collate;";
+        ) $charsetCollate;";
 
         if (!function_exists('dbDelta')) {
             require_once(ABSPATH . 'wp-admin/includes/upgrade.php'); // @codeCoverageIgnore
         }
 
-        dbDelta($sql_logs);
-        dbDelta($sql_stats);
+        dbDelta($sqlLogs);
+        dbDelta($sqlStats);
     }
 
     public function getLogsTableName(): string
@@ -80,11 +79,11 @@ class DatabaseManager
     {
         global $wpdb;
 
-        $table_logs = $this->getLogsTableName();
-        $table_stats = $this->getStatsTableName();
+        $tableLogs = $this->getLogsTableName();
+        $tableStats = $this->getStatsTableName();
 
-        $wpdb->query("DROP TABLE IF EXISTS $table_logs");
-        $wpdb->query("DROP TABLE IF EXISTS $table_stats");
+        $wpdb->query("DROP TABLE IF EXISTS $tableLogs");
+        $wpdb->query("DROP TABLE IF EXISTS $tableStats");
 
         delete_option('em_smtp_db_version');
     }

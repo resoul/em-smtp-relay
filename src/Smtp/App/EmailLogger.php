@@ -17,7 +17,7 @@ class EmailLogger implements EmailLoggerInterface
         $this->events = $events;
     }
 
-    public function logSent(array $emailData): void
+    public function logSent(string $to, string $subject): void
     {
         global $wpdb;
 
@@ -25,17 +25,16 @@ class EmailLogger implements EmailLoggerInterface
 
         $wpdb->insert($table, [
             'status' => 'sent',
-            'recipient' => $this->sanitizeRecipients($emailData['to'] ?? ''),
-            'subject' => sanitize_text_field($emailData['subject'] ?? ''),
-            'metadata' => wp_json_encode($emailData),
+            'recipient' => $to,
+            'subject' => $subject,
             'created_at' => current_time('mysql'),
         ]);
 
         $this->updateStatistics('sent');
-        $this->events->dispatch('email_sent', $emailData);
+        $this->events->dispatch('email_sent', $to, $subject);
     }
 
-    public function logFailed(array $emailData, string $error): void
+    public function logFailed(string $to, string $subject, string $error): void
     {
         global $wpdb;
 
@@ -43,15 +42,14 @@ class EmailLogger implements EmailLoggerInterface
 
         $wpdb->insert($table, [
             'status' => 'failed',
-            'recipient' => $this->sanitizeRecipients($emailData['to'] ?? ''),
-            'subject' => sanitize_text_field($emailData['subject'] ?? ''),
-            'error_message' => sanitize_text_field($error),
-            'metadata' => wp_json_encode($emailData),
+            'recipient' => $to,
+            'subject' => $subject,
+            'error_message' => $error,
             'created_at' => current_time('mysql'),
         ]);
 
         $this->updateStatistics('failed');
-        $this->events->dispatch('email_failed', $emailData, $error);
+        $this->events->dispatch('email_failed', $to, $subject, $error);
     }
 
     public function getRecentLogs(int $limit = 50, ?string $status = null): array
@@ -180,23 +178,18 @@ class EmailLogger implements EmailLoggerInterface
         ", $date, $hour));
     }
 
-    private function sanitizeRecipients($recipients): string
-    {
-        if (is_array($recipients)) {
-            $recipients = implode(', ', $recipients);
-        }
-        return sanitize_text_field($recipients);
-    }
-
     private function getDateFilter(string $period): string
     {
         switch ($period) {
             case 'today':
                 return current_time('Y-m-d 00:00:00');
+
             case 'week':
                 return date('Y-m-d 00:00:00', strtotime('-7 days'));
+
             case 'month':
                 return date('Y-m-d 00:00:00', strtotime('-30 days'));
+
             case 'all':
             default:
                 return '1970-01-01 00:00:00';

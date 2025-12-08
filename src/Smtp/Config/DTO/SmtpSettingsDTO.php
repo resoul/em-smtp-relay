@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Config\DTO;
 
-use Emercury\Smtp\Config\SettingKeys;
 use Emercury\Smtp\App\RequestHandler;
+use Emercury\Smtp\Config\SettingKeys;
 use Emercury\Smtp\Contracts\ConfigInterface;
 
 class SmtpSettingsDTO
@@ -38,6 +38,10 @@ class SmtpSettingsDTO
         $this->smtpPort         = $smtpPort > 0 ? $smtpPort : ($smtpEncryption === 'ssl' ? 465 : 587);
     }
 
+    /**
+     * @param $data array<mixed>
+     * @return SmtpSettingsDTO
+    */
     public static function fromArray(array $data): self
     {
         return new self(
@@ -46,7 +50,7 @@ class SmtpSettingsDTO
             $data[SettingKeys::ENCRYPTION] ?? 'tls',
             $data[SettingKeys::FROM_EMAIL] ?? '',
             $data[SettingKeys::FROM_NAME] ?? '',
-           $data[SettingKeys::FORCE_FROM_ADDRESS] ?? 0,
+            $data[SettingKeys::FORCE_FROM_ADDRESS] ?? 0,
             (int) ($data[SettingKeys::PORT] ?? 0)
         );
     }
@@ -62,10 +66,13 @@ class SmtpSettingsDTO
             $request->getEmail(SettingKeys::FROM_EMAIL),
             $request->getString(SettingKeys::FROM_NAME),
             $request->getInt(SettingKeys::FORCE_FROM_ADDRESS),
-            $request->getInt(SettingKeys::PORT, $smtpEncryption === 'ssl' ? 465 : 587),
+            $request->getInt(SettingKeys::PORT, $smtpEncryption === 'ssl' ? 465 : 587)
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function toArray(): array
     {
         return [

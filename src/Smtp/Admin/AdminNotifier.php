@@ -23,6 +23,9 @@ class AdminNotifier
         $this->addNotice('error', $message);
     }
 
+    /**
+     * @param array<mixed> $messages
+     */
     public function addErrors(array $messages): void
     {
         foreach ($messages as $message) {

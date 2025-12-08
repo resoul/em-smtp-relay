@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
+use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\App\Localization;
+use Emercury\Smtp\App\RequestHandler;
 use Emercury\Smtp\Config\DTO\AdvancedSettingsDTO;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\ValidatorInterface;
-use Emercury\Smtp\Admin\AdminNotifier;
-use Emercury\Smtp\App\RequestHandler;
 
 class AdvancedTab
 {
@@ -27,7 +27,7 @@ class AdvancedTab
         ConfigInterface $config,
         RequestHandler $request,
         Localization $localization,
-        AdminNotifier $notifier
+        AdminNotifier $notifier,
     ) {
         $this->validator = $validator;
         $this->nonceManager = $nonceManager;

@@ -7,6 +7,10 @@ namespace Emercury\Smtp\App;
 class EventManager
 {
     private static ?EventManager $instance = null;
+
+    /**
+     * @var array<string, array<int, callable[]>>
+     */
     private array $listeners = [];
 
     public static function getInstance(): EventManager
@@ -14,6 +18,7 @@ class EventManager
         if (self::$instance === null) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -30,7 +35,7 @@ class EventManager
         $this->listeners[$event][$priority][] = $callback;
     }
 
-    public function dispatch(string $event, ...$args): void
+    public function dispatch(string $event, mixed ...$args): void
     {
         do_action("em_smtp_{$event}", ...$args);
 

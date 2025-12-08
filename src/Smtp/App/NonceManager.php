@@ -19,8 +19,11 @@ class NonceManager implements NonceManagerInterface
         return true;
     }
 
-    public function verifyWithCapability(string $action, string $capability = 'manage_options', string $name = '_wpnonce'): bool
-    {
+    public function verifyWithCapability(
+        string $action,
+        string $capability = 'manage_options',
+        string $name = '_wpnonce'
+    ): bool {
         if (!current_user_can($capability)) {
             return false;
         }

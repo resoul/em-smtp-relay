@@ -1,0 +1,11 @@
+includes:
+  - ./vendor/szepeviktor/phpstan-wordpress/extension.neon
+  - ./vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+  reportUnmatchedIgnoredErrors: true
+  level: 8
+  paths:
+    - ./src
+    - ./tests
+  parallel:
+    processTimeout: 120.0

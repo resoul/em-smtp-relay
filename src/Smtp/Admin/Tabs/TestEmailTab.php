@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
+use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\App\Localization;
+use Emercury\Smtp\App\RequestHandler;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;
 use Emercury\Smtp\Contracts\RateLimiterInterface;
-use Emercury\Smtp\Admin\AdminNotifier;
 
 class TestEmailTab
 {
@@ -18,19 +19,22 @@ class TestEmailTab
     private AdminNotifier $notifier;
 
     private Localization $localization;
+    private RequestHandler $request;
 
     public function __construct(
         NonceManagerInterface $nonceManager,
         ConfigInterface $config,
         RateLimiterInterface $rateLimiter,
         Localization $localization,
-        AdminNotifier $notifier
+        AdminNotifier $notifier,
+        RequestHandler $request
     ) {
         $this->nonceManager = $nonceManager;
         $this->config = $config;
         $this->rateLimiter = $rateLimiter;
         $this->notifier = $notifier;
         $this->localization = $localization;
+        $this->request = $request;
         $this->init();
     }
 
@@ -61,6 +65,7 @@ class TestEmailTab
         }
 
         $userId = get_current_user_id();
+
         if (!$this->rateLimiter->checkLimit('test_email_' . $userId)) {
             $this->notifier->addError(
                 $this->localization->t('Too many test emails sent. Please wait before trying again.')
@@ -68,9 +73,12 @@ class TestEmailTab
             return;
         }
 
-        $to = sanitize_email($_POST['em_smtp_relay_to_email'] ?? '');
-        $subject = sanitize_text_field($_POST['em_smtp_relay_email_subject'] ?? 'Emercury SMTP Test Email');
-        $message = wp_kses_post($_POST['em_smtp_relay_email_body'] ?? 'If you receive this email, Emercury SMTP is working correctly.');
+        $to = $this->request->getEmail('em_smtp_relay_to_email');
+        $subject = $this->request->getString('em_smtp_relay_email_subject', 'Emercury SMTP Test Email');
+        $message = $this->request->getHtml(
+            'em_smtp_relay_email_body',
+            'If you receive this email, Emercury SMTP is working correctly.'
+        );
 
         if (!$this->validateRecipient($to)) {
             $this->notifier->addError(
@@ -105,6 +113,9 @@ class TestEmailTab
             && !empty($data->fromEmail);
     }
 
+    /**
+     * @param array<int, string>|string[] $attachments
+     */
     private function sendTestEmail(string $to, string $subject, string $message, array $attachments = []): void
     {
         $headers = [];
@@ -115,6 +126,7 @@ class TestEmailTab
 
         if (wp_mail($to, $subject, $message, $headers, $attachments)) {
             $attachmentInfo = '';
+
             if (!empty($attachments)) {
                 $attachmentInfo = sprintf(
                     $this->localization->t(' with %d attachment(s)'),
@@ -218,6 +230,7 @@ class TestEmailTab
             wp_mkdir_p($testAttachmentsDir);
 
             $htaccess = $testAttachmentsDir . '/.htaccess';
+
             if (!file_exists($htaccess)) {
                 file_put_contents($htaccess, 'deny from all');
             }

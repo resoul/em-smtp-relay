@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Emercury\Smtp\Admin\Tabs;
 
+use Emercury\Smtp\Admin\AdminNotifier;
 use Emercury\Smtp\App\Localization;
 use Emercury\Smtp\Contracts\ConfigInterface;
 use Emercury\Smtp\Contracts\NonceManagerInterface;
-use Emercury\Smtp\Admin\AdminNotifier;
 
 class ConfigManagerTab
 {
@@ -20,7 +20,7 @@ class ConfigManagerTab
         ConfigInterface $config,
         NonceManagerInterface $nonceManager,
         Localization $localization,
-        AdminNotifier $notifier
+        AdminNotifier $notifier,
     ) {
         $this->config = $config;
         $this->nonceManager = $nonceManager;

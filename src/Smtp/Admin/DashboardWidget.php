@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Emercury\Smtp\Admin;
 
 use Emercury\Smtp\App\Localization;
-use Emercury\Smtp\Contracts\EmailStatisticsInterface;
 use Emercury\Smtp\Contracts\ConfigInterface;
+use Emercury\Smtp\Contracts\EmailStatisticsInterface;
 
 class DashboardWidget
 {
@@ -24,22 +24,12 @@ class DashboardWidget
         $this->localization = $localization;
     }
 
-    /**
-     * Register dashboard widget
-     *
-     * @return void
-     */
     public function register(): void
     {
         add_action('wp_dashboard_setup', [$this, 'addWidget']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueStyles']);
     }
 
-    /**
-     * Add dashboard widget
-     *
-     * @return void
-     */
     public function addWidget(): void
     {
         wp_add_dashboard_widget(
@@ -53,11 +43,6 @@ class DashboardWidget
         );
     }
 
-    /**
-     * Enqueue widget styles
-     *
-     * @return void
-     */
     public function enqueueStyles(): void
     {
         $screen = get_current_screen();
@@ -67,11 +52,6 @@ class DashboardWidget
         }
     }
 
-    /**
-     * Render widget content
-     *
-     * @return void
-     */
     public function render(): void
     {
         $summary = $this->statistics->getSummary();
@@ -85,11 +65,6 @@ class DashboardWidget
         include EM_SMTP_PATH . 'templates/admin/dashboard-widget.php';
     }
 
-    /**
-     * Get inline CSS styles
-     *
-     * @return string
-     */
     private function getInlineStyles(): string
     {
         return '
