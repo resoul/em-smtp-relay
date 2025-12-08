@@ -25,7 +25,7 @@ class ConfigManagerTab
         $this->init();
     }
 
-    protected function init(): void
+    public function init(): void
     {
         add_action('admin_init', function () {
             if (isset($_POST['em_smtp_relay_export_config'])) {

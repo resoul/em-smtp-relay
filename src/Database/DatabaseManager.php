@@ -56,7 +56,10 @@ class DatabaseManager
             UNIQUE KEY date_hour (date, hour)
         ) $charset_collate;";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        if (!function_exists('dbDelta')) {
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php'); // @codeCoverageIgnore
+        }
+
         dbDelta($sql_logs);
         dbDelta($sql_stats);
     }

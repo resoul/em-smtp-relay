@@ -18,6 +18,10 @@ class DatabaseManagerTest extends TestCase
     {
         parent::setUp();
 
+        if (!defined('ABSPATH')) {
+            define('ABSPATH', sys_get_temp_dir() . DIRECTORY_SEPARATOR);
+        }
+
         $this->options = [];
 
         Functions\when('get_option')->alias(function($key, $default = false) {

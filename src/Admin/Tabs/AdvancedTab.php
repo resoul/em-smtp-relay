@@ -34,7 +34,7 @@ class AdvancedTab
         $this->init();
     }
 
-    protected function init(): void
+    public function init(): void
     {
         add_action('admin_init', function () {
             if ($this->request->has('em_smtp_relay_update_advanced_settings')) {
