@@ -10,20 +10,30 @@
     "phpunit/phpunit": "^9.5",
     "mockery/mockery": "^1.5",
     "brain/monkey": "^2.6",
-    "yoast/phpunit-polyfills": "^1.0"
+    "yoast/phpunit-polyfills": "^1.0",
+    "phpstan/phpstan": "^2.1",
+    "slevomat/coding-standard": "~8.0"
   },
   "autoload": {
     "psr-4": {
-      "Emercury\\Smtp\\": "src/"
+      "Emercury\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Emercury\\Smtp\\Tests\\": "tests/"
+      "Emercury\\Tests\\": "tests/"
     }
   },
   "scripts": {
+    "phpcs": "phpcs --standard=phpcs.xml -p --parallel=10 --no-cache",
+    "phpcs-fix": "phpcbf --standard=phpcs.xml -p --parallel=10 --no-cache",
+    "phpstan": "phpstan analyse -c phpstan.neon --no-progress",
     "test": "phpunit tests",
     "test-coverage": "XDEBUG_MODE=coverage phpunit tests --coverage-text=tmp/coverage.txt --coverage-html tmp/coverage-report"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

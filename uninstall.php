@@ -3,7 +3,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
     die;
 }
 
-use Emercury\Smtp\Database\DatabaseManager;
+use Emercury\Smtp\App\DatabaseManager;
 
 delete_option( 'em_smtp_relay_advanced_data' );
 delete_option( 'em_smtp_relay_data' );
