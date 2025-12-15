@@ -45,6 +45,26 @@
                 </p>
             </td>
         </tr>
+        <tr>
+            <th scope="row">
+                <label for="em_smtp_relay_host">
+                    <?php _e('Host', 'em-smtp-relay');?>
+                </label>
+            </th>
+            <td>
+                <input name="em_smtp_relay_host" type="text" id="em_smtp_relay_host" value="<?php echo esc_attr($data->smtpHost); ?>" class="regular-text code">
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="em_smtp_relay_port">
+                    <?php _e('Port', 'em-smtp-relay');?>
+                </label>
+            </th>
+            <td>
+                <input name="em_smtp_relay_port" type="text" id="em_smtp_relay_port" value="<?php echo esc_attr($data->smtpPort); ?>" class="regular-text code">
+            </td>
+        </tr>
         <tr valign="top">
             <th scope="row">
                 <label for="em_smtp_relay_from_email">
@@ -54,7 +74,7 @@
             <td>
                 <input name="em_smtp_relay_from_email" type="text" id="em_smtp_relay_from_email" value="<?php echo esc_attr($data->fromEmail); ?>" class="regular-text code">
                 <p class="description">
-                    <?php _e('The email address to be used as the \'From\' address if none is provided to the mail function. The domain of From Address should be validated in Emercury SMTP panel, Sending Domains section.', 'em-smtp-relay');?>
+                    <?php _e('The email address to be used as the \'From\' address if none is provided to the mail function. The domain of From Address should be validated in Emercury SMTP panel, Sending Domains section. This field is required if you want to send a test email from the "Test Email" tab', 'em-smtp-relay');?>
                 </p>
             </td>
         </tr>

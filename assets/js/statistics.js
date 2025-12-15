@@ -6,7 +6,6 @@
             return;
         }
 
-        // Daily Chart
         const dailyCtx = document.getElementById('dailyChart');
         if (dailyCtx) {
             new Chart(dailyCtx, {
@@ -53,7 +52,6 @@
             });
         }
 
-        // Hourly Chart
         const hourlyCtx = document.getElementById('hourlyChart');
         if (hourlyCtx) {
             new Chart(hourlyCtx, {

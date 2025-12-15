@@ -68,3 +68,22 @@
 .em-smtp-detailed-stats table {
     margin-top: 15px;
 }
+
+.em-smtp-config-manager {
+    max-width: 800px;
+    padding-top: 15px;
+}
+
+.em-smtp-section {
+    margin-bottom: 30px;
+}
+
+.em-smtp-section h2 {
+    margin-top: 0;
+}
+
+.em-smtp-config-manager hr {
+    margin: 40px 0;
+    border: 0;
+    border-top: 1px solid #dcdcde;
+}

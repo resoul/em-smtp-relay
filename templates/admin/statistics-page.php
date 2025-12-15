@@ -1,7 +1,6 @@
 <div class="wrap em-smtp-statistics">
     <h1><?php _e('Email Statistics', 'em-smtp-relay'); ?></h1>
 
-    <!-- Key Metrics -->
     <div class="em-smtp-metrics-grid">
         <div class="em-smtp-metric-card">
             <div class="metric-icon">📧</div>
@@ -53,7 +52,6 @@
         </div>
     </div>
 
-    <!-- Detailed Stats -->
     <div class="em-smtp-detailed-stats">
         <h2><?php _e('Detailed Statistics', 'em-smtp-relay'); ?></h2>
         <table class="wp-list-table widefat fixed striped">

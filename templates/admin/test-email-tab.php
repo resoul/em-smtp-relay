@@ -108,6 +108,12 @@
         </tbody>
     </table>
 
+    <?php if (!empty($debug)): ?>
+        <div class="notice notice-info">
+            <pre><?php echo esc_html($debug); ?></pre>
+        </div>
+    <?php endif; ?>
+
     <p class="submit">
         <input
                 type="submit"

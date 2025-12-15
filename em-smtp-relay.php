@@ -16,9 +16,6 @@
 
 declare(strict_types=1);
 
-use Emercury\Smtp\App\Container;
-use Emercury\Smtp\App\Plugin;
-
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -30,7 +27,7 @@ define('EM_SMTP_URL', plugin_dir_url(__FILE__));
 define('EM_SMTP_BASENAME', plugin_basename(__FILE__));
 
 spl_autoload_register(function (string $class): void {
-    $prefix = 'Emercury\\';
+    $prefix = 'Emercury\\Smtp\\';
     $baseDir = __DIR__ . '/src/';
     $len = strlen($prefix);
 
@@ -47,5 +44,7 @@ spl_autoload_register(function (string $class): void {
 });
 
 add_action('plugins_loaded', function () {
-    (new Plugin(new Container()))->boot();
+    $container = new Emercury\Smtp\Core\Container();
+    $plugin = new Emercury\Smtp\Core\Plugin($container);
+    $plugin->init();
 });

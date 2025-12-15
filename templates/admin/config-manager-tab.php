@@ -1,8 +1,15 @@
+<?php
+/**
+ * @var $l10n LocalizationInterface
+ */
+
+use Emercury\Smtp\Contracts\LocalizationInterface;
+?>
 <div class="em-smtp-config-manager">
     <div class="em-smtp-section">
-        <h2><?php _e('Export Configuration', 'em-smtp-relay'); ?></h2>
+        <h2><?php echo $l10n->esc('Export Configuration'); ?></h2>
         <p class="description">
-            <?php _e('Export your current SMTP configuration to a JSON file. Note: Password will not be included for security reasons.', 'em-smtp-relay'); ?>
+            <?php echo $l10n->esc('Export your current SMTP configuration to a JSON file. Note: Password will not be included for security reasons.'); ?>
         </p>
 
         <form method="post" action="">
@@ -12,7 +19,7 @@
                     type="submit"
                     name="em_smtp_relay_export_config"
                     class="button button-primary"
-                    value="<?php _e('Export Configuration', 'em-smtp-relay'); ?>"
+                    value="<?php echo $l10n->esc('Export Configuration'); ?>"
                 />
             </p>
         </form>
@@ -21,9 +28,9 @@
     <hr>
 
     <div class="em-smtp-section">
-        <h2><?php _e('Import Configuration', 'em-smtp-relay'); ?></h2>
+        <h2><?php echo $l10n->esc('Import Configuration'); ?></h2>
         <p class="description">
-            <?php _e('Import SMTP configuration from a previously exported JSON file.', 'em-smtp-relay'); ?>
+            <?php echo $l10n->esc('Import SMTP configuration from a previously exported JSON file.'); ?>
         </p>
 
         <form method="post" action="" enctype="multipart/form-data">
@@ -34,7 +41,7 @@
                 <tr>
                     <th scope="row">
                         <label for="config_file">
-                            <?php _e('Configuration File', 'em-smtp-relay'); ?>
+                            <?php echo $l10n->esc('Configuration File'); ?>
                         </label>
                     </th>
                     <td>
@@ -46,7 +53,7 @@
                             required
                         />
                         <p class="description">
-                            <?php _e('Select a JSON configuration file (max 1MB)', 'em-smtp-relay'); ?>
+                            <?php echo $l10n->esc('Select a JSON configuration file (max 1MB)'); ?>
                         </p>
                     </td>
                 </tr>
@@ -54,7 +61,7 @@
                 <tr>
                     <th scope="row">
                         <label for="overwrite_password">
-                            <?php _e('Overwrite Password', 'em-smtp-relay'); ?>
+                            <?php echo $l10n->esc('Overwrite Password'); ?>
                         </label>
                     </th>
                     <td>
@@ -65,7 +72,7 @@
                             value="1"
                         />
                         <p class="description">
-                            <?php _e('If unchecked, the current password will be preserved.', 'em-smtp-relay'); ?>
+                            <?php echo $l10n->esc('If unchecked, the current password will be preserved.'); ?>
                         </p>
                     </td>
                 </tr>
@@ -77,30 +84,9 @@
                     type="submit"
                     name="em_smtp_relay_import_config"
                     class="button button-primary"
-                    value="<?php _e('Import Configuration', 'em-smtp-relay'); ?>"
+                    value="<?php echo $l10n->esc('Import Configuration'); ?>"
                 />
             </p>
         </form>
     </div>
 </div>
-
-<style>
-    .em-smtp-config-manager {
-        max-width: 800px;
-        padding-top: 15px;
-    }
-
-    .em-smtp-section {
-        margin-bottom: 30px;
-    }
-
-    .em-smtp-section h2 {
-        margin-top: 0;
-    }
-
-    .em-smtp-config-manager hr {
-        margin: 40px 0;
-        border: 0;
-        border-top: 1px solid #dcdcde;
-    }
-</style>
