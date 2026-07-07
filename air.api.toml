@@ -1,7 +1,0 @@
-root = "."
-tmp_dir = ""
-
-[build]
-cmd = "go build -o ./main ."
-entrypoint = ["./main"]
-args_bin = ["serve"]
